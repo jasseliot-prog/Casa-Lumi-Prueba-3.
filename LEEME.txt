@@ -1,0 +1,5 @@
+CASA-LUMI 2D — FASE 1: INICIO
+Sube index.html, styles.css, app.js y la carpeta assets/ a la raíz de tu repositorio de prueba.
+La ilustración se usa recortada como arte de la portada, no como captura de toda la interfaz.
+El saludo es una oscilación suave de la ilustración completa; mover solo la mano requerirá arte en capas.
+Las habitaciones son pantallas provisionales y no implementan aún rutinas, calendario ni vestidor.
