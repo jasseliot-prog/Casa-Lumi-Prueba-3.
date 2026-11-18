@@ -57,7 +57,11 @@ button{
 }
 button:disabled{opacity:.5;cursor:not-allowed}
 button:hover:not(:disabled){background:#a46bd2}
-.acciones{display:flex;flex-wrap:wrap;justify-content:center}
+.acciones{
+ display:flex;
+ flex-wrap:wrap;
+ justify-content:center;
+}
 .carta{
  background:#492b60;
  padding:17px;
@@ -87,6 +91,13 @@ button:hover:not(:disabled){background:#a46bd2}
  border-radius:12px;
  text-align:center;
 }
+.pendiente{
+ display:inline-block;
+ background:#74419b;
+ padding:7px 12px;
+ border-radius:20px;
+ font-size:13px;
+}
 </style>
 </head>
 
@@ -101,16 +112,18 @@ button:hover:not(:disabled){background:#a46bd2}
  <div class="corazon">💌</div>
  <h1>☾ Buzón Mágico ✦</h1>
  <p>Las cartas de Cony y Yarin 💜</p>
- <p id="aviso" class="aviso"></p>
+ <p id="aviso" class="aviso" aria-live="polite"></p>
 </header>
 
 <section id="acceso" class="panel">
  <h2>🔐 Entrada privada</h2>
  <form id="login">
   <input id="correo" type="email"
-   placeholder="Correo electrónico" required>
+   placeholder="Correo electrónico"
+   autocomplete="username" required>
   <input id="clave" type="password"
-   placeholder="Contraseña" required>
+   placeholder="Contraseña"
+   autocomplete="current-password" required>
   <button type="submit">Entrar al buzón</button>
  </form>
 </section>
@@ -143,12 +156,34 @@ button:hover:not(:disabled){background:#a46bd2}
 
 <section class="panel">
  <h2>📬 Nuestras cartas</h2>
+ <p id="contador" class="aviso"></p>
+
  <div class="acciones">
-  <button id="ver-pendientes">Pendientes</button>
-  <button id="ver-todas">Todas</button>
-  <button id="ver-archivo">Archivadas</button>
+  <button id="ver-pendientes" type="button">
+   Pendientes
+  </button>
+  <button id="ver-todas" type="button">
+   Todas
+  </button>
+  <button id="ver-archivo" type="button">
+   Respondidas
+  </button>
  </div>
+
  <div id="cartas"></div>
+</section>
+
+<section class="panel">
+ <h2>🔔 Notificaciones</h2>
+ <p>
+  Tus cartas seguirán pendientes aunque
+  las leas. El aviso desaparecerá del contador
+  cuando envíes tu respuesta.
+ </p>
+ <button id="activar-notificaciones" type="button">
+  🔔 Activar avisos
+ </button>
+ <p id="estado-notificaciones" class="nota"></p>
 </section>
 
 </div>
@@ -158,9 +193,9 @@ button:hover:not(:disabled){background:#a46bd2}
 </p>
 
 <p class="nota">
- Este buzón necesita Firebase configurado.
- Las cartas se guardan en Cloud Firestore,
- no solamente en este dispositivo.
+ Las cartas se guardan en Cloud Firestore.
+ Las notificaciones externas requieren
+ configurar Firebase Cloud Messaging.
 </p>
 
 </main>
@@ -174,53 +209,50 @@ import {
  signInWithEmailAndPassword,
  signOut,
  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+} from
+ "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 
 import {
  getFirestore,
  collection,
  addDoc,
- getDocs,
  doc,
- updateDoc,
  serverTimestamp,
  onSnapshot,
  query,
- orderBy
-} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+ orderBy,
+ runTransaction
+} from
+ "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-// REEMPLAZAR CON LOS DATOS DE FIREBASE
-const firebaseConfig = {
- apiKey: "TU_API_KEY",
- authDomain: "TU_PROYECTO.firebaseapp.com",
- projectId: "TU_PROYECTO",
- appId: "TU_APP_ID"
-};
+import {firebaseConfig} from "../firebase-config.js";
 
-// REEMPLAZAR CON LOS UID DE AUTHENTICATION
+// CAMBIAR POR LOS UID REALES DE FIREBASE AUTHENTICATION
 const USUARIOS = {
  "UID_DE_CONY": "Cony",
  "UID_DE_YARIN": "Yarin"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
 
-const $ = id => document.getElementById(id);
-const cartasRef = collection(db,"cartas");
+const $=id=>document.getElementById(id);
+const cartasRef=collection(db,"cartas");
 
-let persona = null;
-let cartas = [];
-let filtro = "pendientes";
-let cancelarEscucha = null;
+let persona=null;
+let cartas=[];
+let filtro="pendientes";
+let cancelarEscucha=null;
 
 function informar(texto){
- $("estado").textContent = texto;
+ $("estado").textContent=texto;
 }
 
 function fecha(valor){
- if(!valor || !valor.toDate) return "Enviando...";
+ if(!valor || !valor.toDate)
+  return "Enviando...";
+
  return valor.toDate().toLocaleString("es-CL",{
   dateStyle:"medium",
   timeStyle:"short"
@@ -229,9 +261,13 @@ function fecha(valor){
 
 function crear(tag,contenido,clase){
  const elemento=document.createElement(tag);
+
  if(contenido!==undefined)
   elemento.textContent=contenido;
- if(clase) elemento.className=clase;
+
+ if(clase)
+  elemento.className=clase;
+
  return elemento;
 }
 
@@ -243,19 +279,14 @@ function boton(texto,accion){
 }
 
 function estadoCarta(c){
- const respuestas=c.respuestas||[];
- return respuestas.length ? "archivada" : "pendiente";
+ return (c.respuestas||[]).length
+  ? "respondida"
+  : "pendiente";
 }
 
 function mostrar(){
  const contenedor=$("cartas");
  contenedor.replaceChildren();
-
- const visibles=cartas.filter(c=>{
-  if(filtro==="todas") return true;
-  return estadoCarta(c)===
-   (filtro==="archivo"?"archivada":"pendiente");
- });
 
  const pendientes=cartas.filter(c=>
   c.destinatario===persona &&
@@ -263,8 +294,25 @@ function mostrar(){
  ).length;
 
  $("aviso").textContent=pendientes
-  ? `💌 Tienes ${pendientes} carta(s) esperando tu respuesta`
+  ? `💌 Tienes ${pendientes} carta(s) pendiente(s) de responder`
   : "✨ No tienes cartas pendientes";
+
+ $("contador").textContent=pendientes
+  ? `🔔 ${pendientes} pendiente(s)`
+  : "💜 Todo respondido";
+
+ document.title=pendientes
+  ? `(${pendientes}) Buzón Mágico | Casa-Lumi`
+  : "Buzón Mágico | Casa-Lumi";
+
+ const visibles=cartas.filter(c=>{
+  if(filtro==="todas")return true;
+
+  return estadoCarta(c)===
+   (filtro==="archivo"
+    ? "respondida"
+    : "pendiente");
+ });
 
  if(!visibles.length){
   contenedor.append(
@@ -275,30 +323,51 @@ function mostrar(){
 
  visibles.forEach(c=>{
   const caja=crear("article",undefined,"carta");
-  caja.append(crear("h3","💜 "+c.titulo));
-  caja.append(crear("strong",
-   `${c.autor} → ${c.destinatario}`));
-  caja.append(crear("p",fecha(c.creado),"fecha"));
-  caja.append(crear("p",c.mensaje,"contenido"));
+
+  caja.append(
+   crear("h3","💜 "+c.titulo)
+  );
+
+  caja.append(
+   crear("strong",`${c.autor} → ${c.destinatario}`)
+  );
+
+  caja.append(
+   crear("p",fecha(c.creado),"fecha")
+  );
+
+  caja.append(
+   crear("p",c.mensaje,"contenido")
+  );
 
   const respuestas=c.respuestas||[];
 
   respuestas.forEach(r=>{
    const bloque=crear("div",undefined,"respuesta");
-   bloque.append(crear("strong",r.autor));
-   bloque.append(crear("p",r.mensaje,"contenido"));
-   bloque.append(crear("small",r.fecha,"fecha"));
+
+   bloque.append(
+    crear("strong",r.autor)
+   );
+
+   bloque.append(
+    crear("p",r.mensaje,"contenido")
+   );
+
+   bloque.append(
+    crear("small",r.fecha,"fecha")
+   );
+
    caja.append(bloque);
   });
 
-  caja.append(crear("p",
-   estadoCarta(c)==="pendiente"
-    ?"⏳ Pendiente de respuesta"
-    :"📚 Conversación archivada"
-  ));
+  caja.append(
+   crear("p",
+    estadoCarta(c)==="pendiente"
+     ? "⏳ Pendiente de respuesta"
+     : "💜 Carta respondida"
+   )
+  );
 
-  // Solo responde la persona destinataria.
-  // Una carta se archiva al recibir respuesta.
   if(c.destinatario===persona &&
      !respuestas.length){
 
@@ -309,21 +378,47 @@ function mostrar(){
 
    const responder=boton("💌 Responder",async()=>{
     const mensaje=campo.value.trim();
-    if(!mensaje) return;
+
+    if(!mensaje)return;
 
     responder.disabled=true;
+
     try{
-     await updateDoc(doc(db,"cartas",c.id),{
-      respuestas:[{
-       autor:persona,
-       mensaje,
-       fecha:new Date().toLocaleString("es-CL")
-      }],
-      estado:"archivada"
+     const referencia=doc(db,"cartas",c.id);
+
+     await runTransaction(db,async transaccion=>{
+      const actual=await transaccion.get(referencia);
+
+      if(!actual.exists()){
+       throw new Error("La carta ya no existe.");
+      }
+
+      const datos=actual.data();
+
+      if(datos.destinatario!==persona){
+       throw new Error("Esta carta no es para ti.");
+      }
+
+      if((datos.respuestas||[]).length){
+       throw new Error("Esta carta ya fue respondida.");
+      }
+
+      transaccion.update(referencia,{
+       respuestas:[{
+        autor:persona,
+        mensaje,
+        fecha:new Date().toLocaleString("es-CL")
+       }],
+       estado:"respondida"
+      });
      });
-     informar("Respuesta enviada. Carta archivada 💜");
-    }catch(e){
-     informar("No se pudo responder: "+e.message);
+
+     informar("💜 Respuesta enviada correctamente.");
+
+    }catch(error){
+     informar(
+      "No se pudo responder: "+error.message
+     );
      responder.disabled=false;
     }
    });
@@ -337,20 +432,30 @@ function mostrar(){
 
 $("login").addEventListener("submit",async e=>{
  e.preventDefault();
+
  try{
   await signInWithEmailAndPassword(
    auth,
    $("correo").value.trim(),
    $("clave").value
   );
+
+  $("clave").value="";
   informar("Sesión iniciada.");
- }catch(e){
-  informar("No se pudo iniciar sesión. Revisa tus datos.");
+
+ }catch(error){
+  informar(
+   "No se pudo iniciar sesión. Revisa tus datos."
+  );
  }
 });
 
 $("salir").addEventListener("click",async()=>{
- await signOut(auth);
+ try{
+  await signOut(auth);
+ }catch(error){
+  informar("No se pudo cerrar sesión.");
+ }
 });
 
 $("nueva-carta").addEventListener("submit",async e=>{
@@ -360,7 +465,7 @@ $("nueva-carta").addEventListener("submit",async e=>{
  const titulo=$("titulo").value.trim();
  const mensaje=$("mensaje").value.trim();
 
- if(!destinatario || !titulo || !mensaje) return;
+ if(!destinatario || !titulo || !mensaje)return;
 
  if(destinatario===persona){
   informar("Selecciona a la otra persona.");
@@ -384,8 +489,10 @@ $("nueva-carta").addEventListener("submit",async e=>{
 
   $("nueva-carta").reset();
   informar("💌 Carta enviada correctamente.");
+
  }catch(error){
   informar("Error al enviar: "+error.message);
+
  }finally{
   enviar.disabled=false;
  }
@@ -406,27 +513,64 @@ $("ver-archivo").onclick=()=>{
  mostrar();
 };
 
+$("activar-notificaciones").onclick=async()=>{
+ const salida=$("estado-notificaciones");
+
+ if(!("Notification" in window)){
+  salida.textContent=
+   "Este navegador no admite notificaciones.";
+  return;
+ }
+
+ try{
+  const permiso=await Notification.requestPermission();
+
+  if(permiso==="granted"){
+   salida.textContent=
+    "💜 Permiso concedido. Falta conectar Firebase Cloud Messaging para recibir avisos con Casa-Lumi cerrada.";
+  }else{
+   salida.textContent=
+    "Las notificaciones no están autorizadas.";
+  }
+
+ }catch(error){
+  salida.textContent=
+   "No se pudo solicitar el permiso.";
+ }
+};
+
 onAuthStateChanged(auth,usuario=>{
  if(cancelarEscucha){
   cancelarEscucha();
   cancelarEscucha=null;
  }
 
- persona=usuario ? USUARIOS[usuario.uid] : null;
+ persona=usuario
+  ? USUARIOS[usuario.uid]
+  : null;
 
- $("acceso").classList.toggle("oculto",!!persona);
- $("privado").classList.toggle("oculto",!persona);
+ $("acceso").classList.toggle(
+  "oculto",!!persona
+ );
+
+ $("privado").classList.toggle(
+  "oculto",!persona
+ );
 
  if(!persona){
   cartas=[];
   $("aviso").textContent="";
+
   informar(usuario
-   ?"Esta cuenta no está autorizada."
-   :"Inicia sesión para leer tus cartas.");
+   ? "Esta cuenta no está autorizada."
+   : "Inicia sesión para leer tus cartas.");
+
   return;
  }
 
- $("usuario").textContent="🌙 Sesión de "+persona;
+ $("usuario").textContent=
+  "🌙 Sesión de "+persona;
+
  informar("Buzón conectado 💜");
 
  const consulta=query(
@@ -441,14 +585,16 @@ onAuthStateChanged(auth,usuario=>{
     id:d.id,
     ...d.data()
    }));
+
    mostrar();
   },
   error=>{
-   informar("Error al leer cartas: "+error.message);
+   informar(
+    "Error al leer cartas: "+error.message
+   );
   }
  );
 });
 </script>
 </body>
 </html>
-
