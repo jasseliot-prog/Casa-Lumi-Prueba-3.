@@ -1,78 +1,190 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Clóset Mágico | Casa-Lumi</title>
-<style>
-body{margin:0;background:#160b25;color:#f5efff;font-family:Arial,sans-serif;text-align:center}
-main{max-width:600px;margin:auto;padding:24px}
-h1{color:#d4b2ff}
-.escenario{background:#29183d;border:2px solid #76529b;border-radius:22px;padding:28px;margin:20px 0}
-.personaje{font-size:85px}
-button,.volver{display:inline-block;margin:6px;padding:12px;border:0;border-radius:12px;background:#a77cdb;color:#160b25;font-weight:bold;cursor:pointer;text-decoration:none}
-#frase{color:#e9caff}
-</style>
-<script src="ropa-automatica.js" defer></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clóset Mágico | Casa-Lumi</title>
+  <style>
+    body {
+      margin: 0;
+      background: #160b25;
+      color: #f5efff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    main { max-width: 600px; margin: auto; padding: 24px; }
+    h1 { color: #d4b2ff; }
+    .escenario {
+      background: #29183d;
+      border: 2px solid #76529b;
+      border-radius: 22px;
+      padding: 28px;
+      margin: 20px 0;
+    }
+    .personaje { font-size: 85px; }
+    button, .volver {
+      display: inline-block;
+      margin: 6px;
+      padding: 12px;
+      border: 0;
+      border-radius: 12px;
+      background: #a77cdb;
+      color: #160b25;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    #frase, #estado-clima { color: #e9caff; }
+  </style>
+  <script src="ropa-automatica.js" defer></script>
 </head>
 <body>
-<main>
-<a class="volver" href="../index.html">☾ Volver a casa</a>
-<h1>👗 Mi Clóset Mágico</h1>
-<p>Mi ropa cambia con el clima, la hora y las celebraciones.</p>
-<div class="escenario">
-<div class="personaje" id="personaje">🌙</div>
-<h2 id="conjunto">Preparando vestuario...</h2>
-<p id="frase"></p>
-</div>
-<p>Temperatura de prueba: <span id="temperatura-valor">20</span> °C</p>
-<input id="temperatura" type="range" min="0" max="40" value="20" aria-label="Temperatura de prueba">
-<p>Prueba los conjuntos:</p>
-<div id="opciones"></div>
-<button id="automatico">✨ Vestuario automático</button>
-</main>
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
-const nombres={
-invierno:"❄️ Invierno",verano:"☀️ Verano",
-primavera:"🌸 Primavera",otono:"🍂 Otoño",
-navidad:"🎄 Navidad","ano-nuevo":"✨ Año Nuevo",
-"san-valentin":"💜 San Valentín",
-"fiestas-patrias":"🇨🇱 Fiestas Patrias",
-"pijama-verano":"🌙 Pijama de verano",
-"pijama-invierno":"🌙 Pijama de invierno"
-};
-const iconos={
-invierno:"🧣",verano:"🌞",primavera:"🌷",otono:"🍁",
-navidad:"🎄","ano-nuevo":"🎆","san-valentin":"💜",
-"fiestas-patrias":"🇨🇱","pijama-verano":"🌙",
-"pijama-invierno":"🌜"
-};
-const temperatura=document.getElementById("temperatura");
-function mostrar(id){
-document.getElementById("conjunto").textContent=nombres[id]||id;
-document.getElementById("personaje").textContent=iconos[id]||"🌙";
-document.getElementById("frase").textContent=
-window.CasaLumiRopa?.expresionesLumi?.[id]||"¡Lista para cambiarme!";
-}
-function automatico(){
-const t=Number(temperatura.value);
-const id=window.CasaLumiRopa?.elegirRopaLumi?.(t);
-mostrar(id||"primavera");
-}
-temperatura.addEventListener("input",()=>{
-document.getElementById("temperatura-valor").textContent=temperatura.value;
-automatico();
-});
-Object.keys(nombres).forEach(id=>{
-const boton=document.createElement("button");
-boton.textContent=nombres[id];
-boton.addEventListener("click",()=>mostrar(id));
-document.getElementById("opciones").appendChild(boton);
-});
-document.getElementById("automatico").addEventListener("click",automatico);
-automatico();
-});
-</script>
-<script src="emociones-lumi.js" defer></script></body>
+  <main>
+    <a class="volver" href="../index.html">☾ Volver a casa</a>
+    <h1>👗 Mi Clóset Mágico</h1>
+    <p>Mi ropa cambia con el clima, la hora y las celebraciones.</p>
+
+    <div class="escenario">
+      <div class="personaje" id="personaje">🌙</div>
+      <h2 id="conjunto">Preparando vestuario...</h2>
+      <p id="frase"></p>
+    </div>
+
+    <p>
+      <label for="temperatura">Temperatura de prueba</label>
+      <span id="temperatura-valor">20</span> °C
+    </p>
+    <input id="temperatura" type="range" min="0" max="40" value="20">
+
+    <p>Prueba los conjuntos:</p>
+    <div id="opciones"></div>
+    <button id="automatico" type="button">✨ Vestuario automático</button>
+    <p id="estado-clima" role="status"></p>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const nombres = {
+        invierno: "❄️ Invierno",
+        verano: "☀️ Verano",
+        primavera: "🌸 Primavera",
+        otono: "🍂 Otoño",
+        navidad: "🎄 Navidad",
+        "ano-nuevo": "✨ Año Nuevo",
+        "san-valentin": "💜 San Valentín",
+        "fiestas-patrias": "🇨🇱 Fiestas Patrias",
+        "pijama-verano": "🌙 Pijama de verano",
+        "pijama-invierno": "🌙 Pijama de invierno"
+      };
+
+      const iconos = {
+        invierno: "🧣",
+        verano: "🌞",
+        primavera: "🌷",
+        otono: "🍁",
+        navidad: "🎄",
+        "ano-nuevo": "🎆",
+        "san-valentin": "💜",
+        "fiestas-patrias": "🇨🇱",
+        "pijama-verano": "🌙",
+        "pijama-invierno": "🌜"
+      };
+
+      const temperatura = document.getElementById("temperatura");
+      const estadoClima = document.getElementById("estado-clima");
+      let solicitudClima = 0;
+
+      function mostrar(id) {
+        document.getElementById("conjunto").textContent = nombres[id] || id;
+        document.getElementById("personaje").textContent = iconos[id] || "🌙";
+        document.getElementById("frase").textContent =
+          window.CasaLumiRopa?.expresionesLumi?.[id] || "¡Lista para cambiarme!";
+      }
+
+      function aplicarTemperatura(grados) {
+        const id = window.CasaLumiRopa?.elegirRopaLumi?.(grados);
+        mostrar(id || "primavera");
+      }
+
+      function obtenerUbicacion() {
+        return new Promise((resolver, rechazar) => {
+          if (!navigator.geolocation) {
+            rechazar(new Error("Ubicación no disponible."));
+            return;
+          }
+
+          navigator.geolocation.getCurrentPosition(resolver, rechazar, {
+            timeout: 12000
+          });
+        });
+      }
+
+      async function automatico() {
+        const solicitud = ++solicitudClima;
+        estadoClima.textContent = "Buscando tu ubicación…";
+
+        try {
+          const { coords } = await obtenerUbicacion();
+          if (solicitud !== solicitudClima) return;
+
+          estadoClima.textContent = "Consultando la temperatura local…";
+
+          const url = new URL("https://api.open-meteo.com/v1/forecast");
+          url.search = new URLSearchParams({
+            latitude: coords.latitude.toFixed(2),
+            longitude: coords.longitude.toFixed(2),
+            current: "temperature_2m",
+            temperature_unit: "celsius"
+          });
+
+          const respuesta = await fetch(url, {
+            signal: AbortSignal.timeout(10000)
+          });
+          if (!respuesta.ok) throw new Error("Falló la consulta del clima.");
+
+          const datos = await respuesta.json();
+          const grados = datos.current?.temperature_2m;
+          if (!Number.isFinite(grados)) {
+            throw new Error("Temperatura no disponible.");
+          }
+          if (solicitud !== solicitudClima) return;
+
+          aplicarTemperatura(grados);
+          estadoClima.textContent = `Temperatura en tu ubicación · ${grados} °C`;
+        } catch (error) {
+          if (solicitud !== solicitudClima) return;
+
+          aplicarTemperatura(Number(temperatura.value));
+          estadoClima.textContent = error.code === 1
+            ? "Permite la ubicación para usar el clima local. Por ahora uso la temperatura de prueba."
+            : "No pude obtener el clima local. Por ahora uso la temperatura de prueba.";
+        }
+      }
+
+      temperatura.addEventListener("input", () => {
+        solicitudClima++;
+        document.getElementById("temperatura-valor").textContent = temperatura.value;
+        aplicarTemperatura(Number(temperatura.value));
+        estadoClima.textContent = `Modo de prueba · ${temperatura.value} °C`;
+      });
+
+      const opciones = document.getElementById("opciones");
+      Object.entries(nombres).forEach(([id, nombre]) => {
+        const boton = document.createElement("button");
+        boton.type = "button";
+        boton.textContent = nombre;
+        boton.addEventListener("click", () => {
+          solicitudClima++;
+          mostrar(id);
+          estadoClima.textContent = "Mostrando el traje que elegiste.";
+        });
+        opciones.appendChild(boton);
+      });
+
+      document.getElementById("automatico").addEventListener("click", automatico);
+      automatico();
+    });
+  </script>
+  <script src="emociones-lumi.js" defer></script>
+</body>
 </html>
