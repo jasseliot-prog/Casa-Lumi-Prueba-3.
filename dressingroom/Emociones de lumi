@@ -1,0 +1,123 @@
+
+"use strict";
+
+/* CASA-LUMI · SISTEMA DE EMOCIONES */
+
+(() => {
+  const imagen = document.getElementById("lumi-imagen");
+
+  if (!imagen) {
+    console.warn("No se encontró la imagen de Lumi");
+    return;
+  }
+
+  const emociones = {
+    feliz: "😊 Feliz",
+    triste: "😢 Triste",
+    enojada: "😠 Enojada",
+    sorprendida: "😮 Sorprendida",
+    tranquila: "😌 Tranquila",
+    somnolienta: "😴 Con sueño",
+    emocionada: "🤩 Emocionada"
+  };
+
+  const trajes = [
+    "invierno",
+    "verano",
+    "primavera",
+    "otono",
+    "navidad",
+    "ano-nuevo",
+    "san-valentin",
+    "fiestas-patrias",
+    "pijama-verano",
+    "pijama-invierno"
+  ];
+
+  let ropaActual = "invierno";
+  let emocionActual = "tranquila";
+
+  function detectarRopa(ruta) {
+    const nombre = decodeURIComponent(ruta).toLowerCase();
+
+    return trajes.find(traje =>
+      nombre.includes(traje)
+    ) || ropaActual;
+  }
+
+  ropaActual = detectarRopa(imagen.getAttribute("src") || "");
+
+  function cambiarEmocion(emocion) {
+    if (!emociones[emocion]) return;
+
+    emocionActual = emocion;
+
+    const ruta =
+      `emociones/${ropaActual}/${emocion}.png`;
+
+    const prueba = new Image();
+
+    prueba.onload = () => {
+      imagen.src = ruta;
+    };
+
+    prueba.onerror = () => {
+      console.warn("Imagen no encontrada:", ruta);
+    };
+
+    prueba.src = ruta;
+  }
+
+  // Detecta cuando el vestidor cambia la ropa.
+  const observador = new MutationObserver(() => {
+    const ruta = imagen.getAttribute("src") || "";
+
+    if (ruta.includes("emociones/")) return;
+
+    ropaActual = detectarRopa(ruta);
+    cambiarEmocion(emocionActual);
+  });
+
+  observador.observe(imagen, {
+    attributes: true,
+    attributeFilter: ["src"]
+  });
+
+  // Panel de botones.
+  const panel = document.createElement("section");
+  panel.id = "panel-emociones";
+
+  const titulo = document.createElement("h2");
+  titulo.textContent = "💜 Emociones de Lumi";
+
+  const botones = document.createElement("div");
+  botones.id = "botones-emociones";
+
+  Object.entries(emociones).forEach(([id, nombre]) => {
+    const boton = document.createElement("button");
+
+    boton.type = "button";
+    boton.textContent = nombre;
+
+    boton.addEventListener("click", () => {
+      cambiarEmocion(id);
+    });
+
+    botones.appendChild(boton);
+  });
+
+  panel.append(titulo, botones);
+
+  const escenario = document.querySelector(".escenario");
+
+  if (escenario) {
+    escenario.insertAdjacentElement("afterend", panel);
+  } else {
+    imagen.insertAdjacentElement("afterend", panel);
+  }
+
+  window.LumiEmociones = {
+    cambiar: cambiarEmocion,
+    obtener: () => emocionActual
+  };
+})();
