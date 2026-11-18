@@ -1,0 +1,454 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#160b25">
+<title>Buzón Mágico | Casa-Lumi</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ min-height:100vh;
+ background:radial-gradient(circle at top,#4c2865,#160b25 75%);
+ color:#f8efff;
+ font-family:Arial,sans-serif;
+}
+main{max-width:680px;margin:auto;padding:20px}
+h1,h2{text-align:center;color:#e9c6ff}
+p{line-height:1.6}
+a{color:#e9c6ff}
+.volver{display:inline-block;margin:12px 0 20px}
+.cabecera{text-align:center}
+.corazon{font-size:65px;animation:flotar 3s infinite}
+@keyframes flotar{
+ 50%{transform:translateY(-8px)}
+}
+.panel{
+ background:#301b43;
+ border:2px solid #a875d5;
+ border-radius:24px;
+ padding:20px;
+ margin:18px 0;
+ box-shadow:0 0 22px #b36aff33;
+}
+input,textarea,select{
+ width:100%;
+ padding:13px;
+ margin:8px 0;
+ border:1px solid #ad80d0;
+ border-radius:12px;
+ background:#20122e;
+ color:white;
+ font:inherit;
+}
+textarea{min-height:100px;resize:vertical}
+button{
+ padding:12px 16px;
+ margin:5px;
+ border:0;
+ border-radius:14px;
+ background:#8651b5;
+ color:white;
+ font-weight:bold;
+ cursor:pointer;
+}
+button:disabled{opacity:.5;cursor:not-allowed}
+button:hover:not(:disabled){background:#a46bd2}
+.acciones{display:flex;flex-wrap:wrap;justify-content:center}
+.carta{
+ background:#492b60;
+ padding:17px;
+ border-radius:17px;
+ margin:14px 0;
+ overflow-wrap:anywhere;
+}
+.carta h3{margin-top:0;color:#f0d5ff}
+.respuesta{
+ background:#281838;
+ border-left:3px solid #c795ed;
+ padding:12px;
+ margin:10px 0;
+ border-radius:9px;
+}
+.contenido{white-space:pre-wrap}
+.fecha,.nota{font-size:12px;color:#d7c3e5}
+.aviso{
+ text-align:center;
+ color:#f1d1ff;
+ font-weight:bold;
+}
+.oculto{display:none!important}
+.estado{
+ background:#56336d;
+ padding:10px;
+ border-radius:12px;
+ text-align:center;
+}
+</style>
+</head>
+
+<body>
+<main>
+
+<a href="../index.html" class="volver">
+ ← Volver a Casa-Lumi
+</a>
+
+<header class="cabecera">
+ <div class="corazon">💌</div>
+ <h1>☾ Buzón Mágico ✦</h1>
+ <p>Las cartas de Cony y Yarin 💜</p>
+ <p id="aviso" class="aviso"></p>
+</header>
+
+<section id="acceso" class="panel">
+ <h2>🔐 Entrada privada</h2>
+ <form id="login">
+  <input id="correo" type="email"
+   placeholder="Correo electrónico" required>
+  <input id="clave" type="password"
+   placeholder="Contraseña" required>
+  <button type="submit">Entrar al buzón</button>
+ </form>
+</section>
+
+<div id="privado" class="oculto">
+
+<section class="panel">
+ <p id="usuario"></p>
+ <button id="salir">Cerrar sesión</button>
+</section>
+
+<section class="panel">
+ <h2>✦ Escribir una carta</h2>
+ <form id="nueva-carta">
+  <select id="destinatario" required>
+   <option value="">¿Para quién es?</option>
+   <option value="Cony">Cony</option>
+   <option value="Yarin">Yarin</option>
+  </select>
+
+  <input id="titulo" maxlength="100"
+   placeholder="Título de la carta" required>
+
+  <textarea id="mensaje" maxlength="5000"
+   placeholder="Escribe tu mensaje..." required></textarea>
+
+  <button type="submit">💌 Enviar carta</button>
+ </form>
+</section>
+
+<section class="panel">
+ <h2>📬 Nuestras cartas</h2>
+ <div class="acciones">
+  <button id="ver-pendientes">Pendientes</button>
+  <button id="ver-todas">Todas</button>
+  <button id="ver-archivo">Archivadas</button>
+ </div>
+ <div id="cartas"></div>
+</section>
+
+</div>
+
+<p id="estado" class="estado" role="status">
+ Conectando...
+</p>
+
+<p class="nota">
+ Este buzón necesita Firebase configurado.
+ Las cartas se guardan en Cloud Firestore,
+ no solamente en este dispositivo.
+</p>
+
+</main>
+
+<script type="module">
+import {initializeApp} from
+ "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+
+import {
+ getAuth,
+ signInWithEmailAndPassword,
+ signOut,
+ onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+import {
+ getFirestore,
+ collection,
+ addDoc,
+ getDocs,
+ doc,
+ updateDoc,
+ serverTimestamp,
+ onSnapshot,
+ query,
+ orderBy
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+// REEMPLAZAR CON LOS DATOS DE FIREBASE
+const firebaseConfig = {
+ apiKey: "TU_API_KEY",
+ authDomain: "TU_PROYECTO.firebaseapp.com",
+ projectId: "TU_PROYECTO",
+ appId: "TU_APP_ID"
+};
+
+// REEMPLAZAR CON LOS UID DE AUTHENTICATION
+const USUARIOS = {
+ "UID_DE_CONY": "Cony",
+ "UID_DE_YARIN": "Yarin"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const $ = id => document.getElementById(id);
+const cartasRef = collection(db,"cartas");
+
+let persona = null;
+let cartas = [];
+let filtro = "pendientes";
+let cancelarEscucha = null;
+
+function informar(texto){
+ $("estado").textContent = texto;
+}
+
+function fecha(valor){
+ if(!valor || !valor.toDate) return "Enviando...";
+ return valor.toDate().toLocaleString("es-CL",{
+  dateStyle:"medium",
+  timeStyle:"short"
+ });
+}
+
+function crear(tag,contenido,clase){
+ const elemento=document.createElement(tag);
+ if(contenido!==undefined)
+  elemento.textContent=contenido;
+ if(clase) elemento.className=clase;
+ return elemento;
+}
+
+function boton(texto,accion){
+ const b=crear("button",texto);
+ b.type="button";
+ b.addEventListener("click",accion);
+ return b;
+}
+
+function estadoCarta(c){
+ const respuestas=c.respuestas||[];
+ return respuestas.length ? "archivada" : "pendiente";
+}
+
+function mostrar(){
+ const contenedor=$("cartas");
+ contenedor.replaceChildren();
+
+ const visibles=cartas.filter(c=>{
+  if(filtro==="todas") return true;
+  return estadoCarta(c)===
+   (filtro==="archivo"?"archivada":"pendiente");
+ });
+
+ const pendientes=cartas.filter(c=>
+  c.destinatario===persona &&
+  estadoCarta(c)==="pendiente"
+ ).length;
+
+ $("aviso").textContent=pendientes
+  ? `💌 Tienes ${pendientes} carta(s) esperando tu respuesta`
+  : "✨ No tienes cartas pendientes";
+
+ if(!visibles.length){
+  contenedor.append(
+   crear("p","No hay cartas en esta sección. ✨")
+  );
+  return;
+ }
+
+ visibles.forEach(c=>{
+  const caja=crear("article",undefined,"carta");
+  caja.append(crear("h3","💜 "+c.titulo));
+  caja.append(crear("strong",
+   `${c.autor} → ${c.destinatario}`));
+  caja.append(crear("p",fecha(c.creado),"fecha"));
+  caja.append(crear("p",c.mensaje,"contenido"));
+
+  const respuestas=c.respuestas||[];
+
+  respuestas.forEach(r=>{
+   const bloque=crear("div",undefined,"respuesta");
+   bloque.append(crear("strong",r.autor));
+   bloque.append(crear("p",r.mensaje,"contenido"));
+   bloque.append(crear("small",r.fecha,"fecha"));
+   caja.append(bloque);
+  });
+
+  caja.append(crear("p",
+   estadoCarta(c)==="pendiente"
+    ?"⏳ Pendiente de respuesta"
+    :"📚 Conversación archivada"
+  ));
+
+  // Solo responde la persona destinataria.
+  // Una carta se archiva al recibir respuesta.
+  if(c.destinatario===persona &&
+     !respuestas.length){
+
+   const campo=document.createElement("textarea");
+   campo.placeholder="Escribe tu respuesta...";
+   campo.maxLength=5000;
+   caja.append(campo);
+
+   const responder=boton("💌 Responder",async()=>{
+    const mensaje=campo.value.trim();
+    if(!mensaje) return;
+
+    responder.disabled=true;
+    try{
+     await updateDoc(doc(db,"cartas",c.id),{
+      respuestas:[{
+       autor:persona,
+       mensaje,
+       fecha:new Date().toLocaleString("es-CL")
+      }],
+      estado:"archivada"
+     });
+     informar("Respuesta enviada. Carta archivada 💜");
+    }catch(e){
+     informar("No se pudo responder: "+e.message);
+     responder.disabled=false;
+    }
+   });
+
+   caja.append(responder);
+  }
+
+  contenedor.append(caja);
+ });
+}
+
+$("login").addEventListener("submit",async e=>{
+ e.preventDefault();
+ try{
+  await signInWithEmailAndPassword(
+   auth,
+   $("correo").value.trim(),
+   $("clave").value
+  );
+  informar("Sesión iniciada.");
+ }catch(e){
+  informar("No se pudo iniciar sesión. Revisa tus datos.");
+ }
+});
+
+$("salir").addEventListener("click",async()=>{
+ await signOut(auth);
+});
+
+$("nueva-carta").addEventListener("submit",async e=>{
+ e.preventDefault();
+
+ const destinatario=$("destinatario").value;
+ const titulo=$("titulo").value.trim();
+ const mensaje=$("mensaje").value.trim();
+
+ if(!destinatario || !titulo || !mensaje) return;
+
+ if(destinatario===persona){
+  informar("Selecciona a la otra persona.");
+  return;
+ }
+
+ const enviar=e.submitter;
+ enviar.disabled=true;
+
+ try{
+  await addDoc(cartasRef,{
+   autor:persona,
+   autorUid:auth.currentUser.uid,
+   destinatario,
+   titulo,
+   mensaje,
+   respuestas:[],
+   estado:"pendiente",
+   creado:serverTimestamp()
+  });
+
+  $("nueva-carta").reset();
+  informar("💌 Carta enviada correctamente.");
+ }catch(error){
+  informar("Error al enviar: "+error.message);
+ }finally{
+  enviar.disabled=false;
+ }
+});
+
+$("ver-pendientes").onclick=()=>{
+ filtro="pendientes";
+ mostrar();
+};
+
+$("ver-todas").onclick=()=>{
+ filtro="todas";
+ mostrar();
+};
+
+$("ver-archivo").onclick=()=>{
+ filtro="archivo";
+ mostrar();
+};
+
+onAuthStateChanged(auth,usuario=>{
+ if(cancelarEscucha){
+  cancelarEscucha();
+  cancelarEscucha=null;
+ }
+
+ persona=usuario ? USUARIOS[usuario.uid] : null;
+
+ $("acceso").classList.toggle("oculto",!!persona);
+ $("privado").classList.toggle("oculto",!persona);
+
+ if(!persona){
+  cartas=[];
+  $("aviso").textContent="";
+  informar(usuario
+   ?"Esta cuenta no está autorizada."
+   :"Inicia sesión para leer tus cartas.");
+  return;
+ }
+
+ $("usuario").textContent="🌙 Sesión de "+persona;
+ informar("Buzón conectado 💜");
+
+ const consulta=query(
+  cartasRef,
+  orderBy("creado","desc")
+ );
+
+ cancelarEscucha=onSnapshot(
+  consulta,
+  resultado=>{
+   cartas=resultado.docs.map(d=>({
+    id:d.id,
+    ...d.data()
+   }));
+   mostrar();
+  },
+  error=>{
+   informar("Error al leer cartas: "+error.message);
+  }
+ );
+});
+</script>
+</body>
+</html>
+
