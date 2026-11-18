@@ -1,190 +1,490 @@
+
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Clóset Mágico | Casa-Lumi</title>
-  <style>
-    body {
-      margin: 0;
-      background: #160b25;
-      color: #f5efff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-    main { max-width: 600px; margin: auto; padding: 24px; }
-    h1 { color: #d4b2ff; }
-    .escenario {
-      background: #29183d;
-      border: 2px solid #76529b;
-      border-radius: 22px;
-      padding: 28px;
-      margin: 20px 0;
-    }
-    .personaje { font-size: 85px; }
-    button, .volver {
-      display: inline-block;
-      margin: 6px;
-      padding: 12px;
-      border: 0;
-      border-radius: 12px;
-      background: #a77cdb;
-      color: #160b25;
-      font-weight: bold;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    #frase, #estado-clima { color: #e9caff; }
-  </style>
-  <script src="ropa-automatica.js" defer></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#160b25">
+<title>Clóset Mágico | Casa-Lumi</title>
+
+<style>
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  background:radial-gradient(circle at top,#38204e,#160b25 70%);
+  color:#f5efff;
+  font-family:Arial,sans-serif;
+  text-align:center;
+}
+
+main {
+  max-width:650px;
+  margin:auto;
+  padding:24px 14px 45px;
+}
+
+h1 { color:#d4b2ff; }
+
+.escenario,.panel {
+  background:#29183d;
+  border:2px solid #76529b;
+  border-radius:24px;
+  padding:20px 12px;
+  margin:20px 0;
+}
+
+.escenario {
+  box-shadow:0 0 22px #a77cdb44;
+}
+
+.personaje {
+  display:block;
+  width:min(100%,340px);
+  height:auto;
+  max-height:450px;
+  object-fit:contain;
+  margin:0 auto;
+  filter:drop-shadow(0 0 18px #b17eff55);
+}
+
+button,.volver {
+  display:inline-block;
+  margin:5px;
+  padding:12px 15px;
+  border:2px solid #c38aff;
+  border-radius:16px;
+  background:linear-gradient(145deg,#77449d,#48235e);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  text-decoration:none;
+}
+
+button.activo {
+  background:#b78ae7;
+  color:#160b25;
+  border-color:white;
+}
+
+.botones {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:5px;
+}
+
+#frase,#estado-clima,#emocion-actual {
+  color:#e9caff;
+  line-height:1.5;
+}
+
+#temperatura {
+  width:min(100%,350px);
+  accent-color:#b783f5;
+}
+
+.nota {
+  color:#cbb4df;
+  font-size:13px;
+}
+</style>
+
+<script src="ropa-automatica.js" defer></script>
 </head>
+
 <body>
-  <main>
-    <a class="volver" href="../index.html">☾ Volver a casa</a>
-    <h1>👗 Mi Clóset Mágico</h1>
-    <p>Mi ropa cambia con el clima, la hora y las celebraciones.</p>
+<main>
 
-    <div class="escenario">
-      <div class="personaje" id="personaje">🌙</div>
-      <h2 id="conjunto">Preparando vestuario...</h2>
-      <p id="frase"></p>
-    </div>
+<a class="volver" href="../index.html">
+  ☾ Volver a casa
+</a>
 
-    <p>
-      <label for="temperatura">Temperatura de prueba</label>
-      <span id="temperatura-valor">20</span> °C
-    </p>
-    <input id="temperatura" type="range" min="0" max="40" value="20">
+<h1>👗 Mi Clóset Mágico</h1>
 
-    <p>Prueba los conjuntos:</p>
-    <div id="opciones"></div>
-    <button id="automatico" type="button">✨ Vestuario automático</button>
-    <p id="estado-clima" role="status"></p>
-  </main>
+<p>
+  Mi ropa cambia con el clima,
+  la hora y las celebraciones.
+</p>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const nombres = {
-        invierno: "❄️ Invierno",
-        verano: "☀️ Verano",
-        primavera: "🌸 Primavera",
-        otono: "🍂 Otoño",
-        navidad: "🎄 Navidad",
-        "ano-nuevo": "✨ Año Nuevo",
-        "san-valentin": "💜 San Valentín",
-        "fiestas-patrias": "🇨🇱 Fiestas Patrias",
-        "pijama-verano": "🌙 Pijama de verano",
-        "pijama-invierno": "🌙 Pijama de invierno"
-      };
+<section class="escenario">
+  <img
+    class="personaje"
+    id="lumi-imagen"
+    src="invierno.webp"
+    alt="Lumi con su vestuario"
+  >
 
-      const iconos = {
-        invierno: "🧣",
-        verano: "🌞",
-        primavera: "🌷",
-        otono: "🍁",
-        navidad: "🎄",
-        "ano-nuevo": "🎆",
-        "san-valentin": "💜",
-        "fiestas-patrias": "🇨🇱",
-        "pijama-verano": "🌙",
-        "pijama-invierno": "🌜"
-      };
+  <h2 id="conjunto">Preparando vestuario...</h2>
+  <p id="frase"></p>
+  <p id="emocion-actual" aria-live="polite"></p>
+</section>
 
-      const temperatura = document.getElementById("temperatura");
-      const estadoClima = document.getElementById("estado-clima");
-      let solicitudClima = 0;
+<section class="panel">
+  <h2>💜 Mis emociones</h2>
+  <div id="opciones-emociones" class="botones"></div>
+</section>
 
-      function mostrar(id) {
-        document.getElementById("conjunto").textContent = nombres[id] || id;
-        document.getElementById("personaje").textContent = iconos[id] || "🌙";
-        document.getElementById("frase").textContent =
-          window.CasaLumiRopa?.expresionesLumi?.[id] || "¡Lista para cambiarme!";
-      }
+<section class="panel">
+  <h2>👗 Mis conjuntos</h2>
+  <div id="opciones" class="botones"></div>
+</section>
 
-      function aplicarTemperatura(grados) {
-        const id = window.CasaLumiRopa?.elegirRopaLumi?.(grados);
-        mostrar(id || "primavera");
-      }
+<section class="panel">
+  <h2>🌤️ Vestuario automático</h2>
 
-      function obtenerUbicacion() {
-        return new Promise((resolver, rechazar) => {
-          if (!navigator.geolocation) {
-            rechazar(new Error("Ubicación no disponible."));
-            return;
-          }
+  <p>
+    <label for="temperatura">
+      Temperatura de prueba:
+    </label>
+    <span id="temperatura-valor">20</span> °C
+  </p>
 
-          navigator.geolocation.getCurrentPosition(resolver, rechazar, {
-            timeout: 12000
-          });
-        });
-      }
+  <input
+    id="temperatura"
+    type="range"
+    min="0"
+    max="40"
+    value="20"
+  >
 
-      async function automatico() {
-        const solicitud = ++solicitudClima;
-        estadoClima.textContent = "Buscando tu ubicación…";
+  <p>
+    <button id="automatico" type="button">
+      ✨ Vestuario automático
+    </button>
+  </p>
 
-        try {
-          const { coords } = await obtenerUbicacion();
-          if (solicitud !== solicitudClima) return;
+  <p id="estado-clima" role="status"></p>
+</section>
 
-          estadoClima.textContent = "Consultando la temperatura local…";
+<p class="nota">
+  ✦ Casa-Lumi · Mi pequeño mundo digital ✦
+</p>
 
-          const url = new URL("https://api.open-meteo.com/v1/forecast");
-          url.search = new URLSearchParams({
-            latitude: coords.latitude.toFixed(2),
-            longitude: coords.longitude.toFixed(2),
-            current: "temperature_2m",
-            temperature_unit: "celsius"
-          });
+</main>
 
-          const respuesta = await fetch(url, {
-            signal: AbortSignal.timeout(10000)
-          });
-          if (!respuesta.ok) throw new Error("Falló la consulta del clima.");
+<script>
+"use strict";
 
-          const datos = await respuesta.json();
-          const grados = datos.current?.temperature_2m;
-          if (!Number.isFinite(grados)) {
-            throw new Error("Temperatura no disponible.");
-          }
-          if (solicitud !== solicitudClima) return;
+document.addEventListener("DOMContentLoaded", () => {
 
-          aplicarTemperatura(grados);
-          estadoClima.textContent = `Temperatura en tu ubicación · ${grados} °C`;
-        } catch (error) {
-          if (solicitud !== solicitudClima) return;
+  const nombres = {
+    invierno:"❄️ Invierno",
+    verano:"☀️ Verano",
+    primavera:"🌸 Primavera",
+    otono:"🍂 Otoño",
+    navidad:"🎄 Navidad",
+    "ano-nuevo":"✨ Año Nuevo",
+    "san-valentin":"💕 San Valentín",
+    "fiestas-patrias":"🇨🇱 Fiestas Patrias",
+    "pijama-verano":"🌙 Pijama verano",
+    "pijama-invierno":"⭐ Pijama invierno"
+  };
 
-          aplicarTemperatura(Number(temperatura.value));
-          estadoClima.textContent = error.code === 1
-            ? "Permite la ubicación para usar el clima local. Por ahora uso la temperatura de prueba."
-            : "No pude obtener el clima local. Por ahora uso la temperatura de prueba.";
-        }
-      }
+  const emociones = {
+    feliz:"😊 Feliz",
+    triste:"😢 Triste",
+    enojada:"😠 Enojada",
+    sorprendida:"😮 Sorprendida",
+    tranquila:"😌 Tranquila",
+    somnolienta:"😴 Con sueño",
+    emocionada:"🤩 Emocionada"
+  };
 
-      temperatura.addEventListener("input", () => {
-        solicitudClima++;
-        document.getElementById("temperatura-valor").textContent = temperatura.value;
-        aplicarTemperatura(Number(temperatura.value));
-        estadoClima.textContent = `Modo de prueba · ${temperatura.value} °C`;
-      });
+  const frases = {
+    feliz:"¡Qué bonito día!",
+    triste:"Hoy estoy un poquito triste.",
+    enojada:"¡Grrr! Necesito un momento.",
+    sorprendida:"¡Oh! ¡Qué sorpresa!",
+    tranquila:"Estoy disfrutando mi día.",
+    somnolienta:"Creo que tengo sueño...",
+    emocionada:"¡Qué emoción!"
+  };
 
-      const opciones = document.getElementById("opciones");
-      Object.entries(nombres).forEach(([id, nombre]) => {
-        const boton = document.createElement("button");
-        boton.type = "button";
-        boton.textContent = nombre;
-        boton.addEventListener("click", () => {
-          solicitudClima++;
-          mostrar(id);
-          estadoClima.textContent = "Mostrando el traje que elegiste.";
-        });
-        opciones.appendChild(boton);
-      });
+  const imagen = document.getElementById("lumi-imagen");
+  const conjunto = document.getElementById("conjunto");
+  const frase = document.getElementById("frase");
+  const emocionTexto = document.getElementById("emocion-actual");
+  const estadoClima = document.getElementById("estado-clima");
+  const temperatura = document.getElementById("temperatura");
 
-      document.getElementById("automatico").addEventListener("click", automatico);
-      automatico();
+  let ropaActual = "invierno";
+  let emocionActual = "tranquila";
+  let solicitudClima = 0;
+  let solicitudImagen = 0;
+
+  // Imágenes originales del vestidor.
+  const rutaRopa = id => `${id}.webp`;
+
+  // Imágenes de cada emoción y traje.
+  const rutaEmocion = (ropa, emocion) =>
+    `emociones/${ropa}/${emocion}.png`;
+
+  function actualizarBotones(contenedor, actual) {
+    contenedor.querySelectorAll("button").forEach(boton => {
+      boton.classList.toggle(
+        "activo",
+        boton.dataset.id === actual
+      );
     });
-  </script>
-  <script src="emociones-lumi.js" defer></script>
+  }
+
+  function cargarImagen() {
+    const solicitud = ++solicitudImagen;
+    const especial = rutaEmocion(ropaActual,emocionActual);
+
+    const prueba = new Image();
+
+    prueba.onload = () => {
+      if (solicitud !== solicitudImagen) return;
+      imagen.src = especial;
+    };
+
+    prueba.onerror = () => {
+      if (solicitud !== solicitudImagen) return;
+      imagen.src = rutaRopa(ropaActual);
+    };
+
+    prueba.src = especial;
+  }
+
+  function cambiarRopa(id) {
+    if (!nombres[id]) return;
+
+    ropaActual = id;
+    conjunto.textContent = nombres[id];
+
+    actualizarBotones(
+      document.getElementById("opciones"),
+      id
+    );
+
+    cargarImagen();
+  }
+
+  function cambiarEmocion(id) {
+    if (!emociones[id]) return;
+
+    emocionActual = id;
+    emocionTexto.textContent = emociones[id];
+    frase.textContent = frases[id];
+
+    actualizarBotones(
+      document.getElementById("opciones-emociones"),
+      id
+    );
+
+    cargarImagen();
+  }
+
+  function crearBotones(datos,contenedor,accion) {
+    Object.entries(datos).forEach(([id,nombre]) => {
+      const boton = document.createElement("button");
+
+      boton.type = "button";
+      boton.dataset.id = id;
+      boton.textContent = nombre;
+
+      boton.addEventListener("click",() => accion(id));
+
+      contenedor.appendChild(boton);
+    });
+  }
+
+  crearBotones(
+    nombres,
+    document.getElementById("opciones"),
+    id => {
+      solicitudClima++;
+      cambiarRopa(id);
+      estadoClima.textContent =
+        "Mostrando el traje que elegiste.";
+    }
+  );
+
+  crearBotones(
+    emociones,
+    document.getElementById("opciones-emociones"),
+    cambiarEmocion
+  );
+
+  function elegirRopaLocal(grados) {
+    const ahora = new Date();
+    const mes = ahora.getMonth() + 1;
+    const dia = ahora.getDate();
+    const hora = ahora.getHours();
+
+    if (mes === 12 && (dia === 24 || dia === 25))
+      return "navidad";
+
+    if ((mes === 12 && dia === 31) ||
+        (mes === 1 && dia === 1))
+      return "ano-nuevo";
+
+    if (mes === 2 && dia === 14)
+      return "san-valentin";
+
+    if (mes === 9 && (dia === 18 || dia === 19))
+      return "fiestas-patrias";
+
+    if (hora >= 21 || hora < 7) {
+      return grados < 18
+        ? "pijama-invierno"
+        : "pijama-verano";
+    }
+
+    if (grados <= 14) return "invierno";
+    if (grados >= 27) return "verano";
+
+    if (mes >= 3 && mes <= 5) return "otono";
+    if (mes >= 9 && mes <= 11) return "primavera";
+
+    return grados < 19 ? "invierno" : "verano";
+  }
+
+  function aplicarTemperatura(grados) {
+    const funcionExterna =
+      window.CasaLumiRopa?.elegirRopaLumi;
+
+    let id;
+
+    if (typeof funcionExterna === "function") {
+      try {
+        id = funcionExterna(grados);
+      } catch (error) {
+        console.warn(error);
+      }
+    }
+
+    if (!nombres[id]) {
+      id = elegirRopaLocal(grados);
+    }
+
+    cambiarRopa(id);
+  }
+
+  function obtenerUbicacion() {
+    return new Promise((resolver,rechazar) => {
+      if (!navigator.geolocation) {
+        rechazar(new Error("Ubicación no disponible"));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        resolver,
+        rechazar,
+        {timeout:12000}
+      );
+    });
+  }
+
+  async function automatico() {
+    const solicitud = ++solicitudClima;
+
+    estadoClima.textContent =
+      "Buscando tu ubicación...";
+
+    try {
+      const {coords} = await obtenerUbicacion();
+
+      if (solicitud !== solicitudClima) return;
+
+      estadoClima.textContent =
+        "Consultando temperatura local...";
+
+      const url = new URL(
+        "https://api.open-meteo.com/v1/forecast"
+      );
+
+      url.search = new URLSearchParams({
+        latitude:coords.latitude.toFixed(2),
+        longitude:coords.longitude.toFixed(2),
+        current:"temperature_2m",
+        temperature_unit:"celsius"
+      });
+
+      const controlador = new AbortController();
+      const limite = setTimeout(
+        () => controlador.abort(),
+        10000
+      );
+
+      let respuesta;
+
+      try {
+        respuesta = await fetch(url,{
+          signal:controlador.signal
+        });
+      } finally {
+        clearTimeout(limite);
+      }
+
+      if (!respuesta.ok) {
+        throw new Error("No se pudo consultar el clima");
+      }
+
+      const datos = await respuesta.json();
+      const grados = datos.current?.temperature_2m;
+
+      if (!Number.isFinite(grados)) {
+        throw new Error("Temperatura no disponible");
+      }
+
+      if (solicitud !== solicitudClima) return;
+
+      temperatura.value = Math.max(
+        0,
+        Math.min(40,Math.round(grados))
+      );
+
+      document.getElementById(
+        "temperatura-valor"
+      ).textContent = grados;
+
+      aplicarTemperatura(grados);
+
+      estadoClima.textContent =
+        `Temperatura local: ${grados} °C`;
+
+    } catch (error) {
+      if (solicitud !== solicitudClima) return;
+
+      aplicarTemperatura(Number(temperatura.value));
+
+      estadoClima.textContent =
+        "No pude consultar el clima. " +
+        "Estoy usando la temperatura de prueba.";
+    }
+  }
+
+  temperatura.addEventListener("input",() => {
+    solicitudClima++;
+
+    document.getElementById(
+      "temperatura-valor"
+    ).textContent = temperatura.value;
+
+    aplicarTemperatura(Number(temperatura.value));
+
+    estadoClima.textContent =
+      `Modo prueba: ${temperatura.value} °C`;
+  });
+
+  document.getElementById("automatico")
+    .addEventListener("click",automatico);
+
+  // Control para futuras animaciones.
+  window.LumiEmociones = {
+    cambiar:cambiarEmocion,
+    obtener:() => emocionActual
+  };
+
+  cambiarEmocion("tranquila");
+  cambiarRopa("invierno");
+  automatico();
+
+});
+</script>
+
 </body>
 </html>
