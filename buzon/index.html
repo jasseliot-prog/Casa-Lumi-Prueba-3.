@@ -188,7 +188,8 @@ button.activo{
  <button id="activar-notificaciones" type="button">
   🔔 Activar avisos
  </button>
- <p id="estado-notificaciones" class="nota"></p>
+ <p id="estado-notificaciones" class="nota"
+    aria-live="polite"></p>
 </section>
 
 </div>
@@ -199,8 +200,8 @@ button.activo{
 
 <p class="nota">
  Las cartas se guardan en Cloud Firestore.
- Los avisos externos requieren configurar
- Firebase Cloud Messaging.
+ Los avisos con el buzón cerrado requieren
+ configurar el envío automático desde Firebase.
 </p>
 
 </main>
@@ -225,12 +226,22 @@ import {
  collection,
  addDoc,
  doc,
+ setDoc,
+ deleteDoc,
  serverTimestamp,
  onSnapshot,
  query,
  orderBy,
  runTransaction
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+import {
+ getMessaging,
+ getToken,
+ isSupported,
+ onMessage,
+ deleteToken
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-messaging.js";
 
 import {
  firebaseConfig
@@ -241,6 +252,10 @@ const USUARIOS = {
  "V8sDSqTd6RNzpTtysN4Qo3rvOdI3": "Cony",
  "dXP90jsZJOQswVSqhctV3fuyQm42": "Yarin"
 };
+
+// CLAVE PÚBLICA VAPID DE CASA-LUMI
+const VAPID_KEY =
+ "BH8-XuQqUbOrrnj18z-MhJEQ59Lih84cuoghiJFjPvI0TnoN-DuCQK6pjaJ0i7L0JxfYH_tOboB4j1dZBx83WZM";
 
 const app=getApps().length
  ? getApp()
@@ -257,8 +272,17 @@ let cartas=[];
 let filtro="pendientes";
 let cancelarEscucha=null;
 
+let messaging=null;
+let registroSW=null;
+let tokenActual=null;
+let cancelarMensajes=null;
+
 function informar(texto){
  $("estado").textContent=texto;
+}
+
+function informarNotificaciones(texto){
+ $("estado-notificaciones").textContent=texto;
 }
 
 function fecha(valor){
@@ -455,6 +479,160 @@ function mostrar(){
  });
 }
 
+// ====================================
+// FIREBASE CLOUD MESSAGING
+// ====================================
+
+// El Service Worker está en la raíz
+// del proyecto, no dentro de /buzon/.
+const RUTA_SW =
+ "/Casa-Lumi-Prueba-3./firebase-messaging-sw.js";
+
+async function prepararMessaging(){
+ if(!("serviceWorker" in navigator)){
+  throw new Error(
+   "Este navegador no admite Service Workers."
+  );
+ }
+
+ if(!("Notification" in window)){
+  throw new Error(
+   "Este navegador no admite notificaciones."
+  );
+ }
+
+ if(!(await isSupported())){
+  throw new Error(
+   "Firebase Messaging no es compatible con este navegador."
+  );
+ }
+
+ if(!registroSW){
+  registroSW=await navigator.serviceWorker.register(
+   RUTA_SW,
+   {scope:"/Casa-Lumi-Prueba-3./"}
+  );
+ }
+
+ if(!messaging){
+  messaging=getMessaging(app);
+ }
+
+ if(!cancelarMensajes){
+  cancelarMensajes=onMessage(messaging,payload=>{
+   const titulo=payload.notification?.title
+    ||"💌 Buzón Mágico";
+
+   const cuerpo=payload.notification?.body
+    ||"Tienes una nueva carta en Casa-Lumi.";
+
+   informarNotificaciones(
+    `${titulo}: ${cuerpo}`
+   );
+
+   informar("💌 Ha llegado una notificación.");
+  });
+ }
+
+ return messaging;
+}
+
+// Un identificador estable por instalación.
+// No contiene la contraseña ni el mensaje.
+function idDispositivo(){
+ const clave="casa-lumi-id-dispositivo";
+ let id=localStorage.getItem(clave);
+
+ if(!id){
+  id=crypto.randomUUID();
+  localStorage.setItem(clave,id);
+ }
+
+ return id;
+}
+
+async function activarAvisos(){
+ if(!persona || !auth.currentUser){
+  informarNotificaciones(
+   "Primero inicia sesión en el buzón."
+  );
+  return;
+ }
+
+ const botonAvisos=$("activar-notificaciones");
+ botonAvisos.disabled=true;
+
+ try{
+  informarNotificaciones(
+   "Conectando este celular con Firebase..."
+  );
+
+  const permiso=await Notification.requestPermission();
+
+  if(permiso!=="granted"){
+   informarNotificaciones(
+    "Las notificaciones no están autorizadas."
+   );
+   return;
+  }
+
+  const servicio=await prepararMessaging();
+
+  const token=await getToken(servicio,{
+   vapidKey:VAPID_KEY,
+   serviceWorkerRegistration:registroSW
+  });
+
+  if(!token){
+   throw new Error(
+    "Firebase no entregó un token de notificaciones."
+   );
+  }
+
+  tokenActual=token;
+
+  // Guardamos el token en un documento
+  // perteneciente a la cuenta autenticada.
+  const uid=auth.currentUser.uid;
+  const dispositivo=idDispositivo();
+
+  const referencia=doc(
+   db,
+   "usuarios",
+   uid,
+   "dispositivos",
+   dispositivo
+  );
+
+  await setDoc(referencia,{
+   uid,
+   persona,
+   token,
+   actualizado:serverTimestamp()
+  });
+
+  informarNotificaciones(
+   "💜 Este celular quedó registrado en Firebase. " +
+   "Falta configurar el envío automático desde el servidor."
+  );
+
+ }catch(error){
+  console.error("Error de notificaciones:",error);
+
+  informarNotificaciones(
+   "No se pudo registrar el celular: "+
+   error.message
+  );
+
+ }finally{
+  botonAvisos.disabled=false;
+ }
+}
+
+// ====================================
+// INICIO DE SESIÓN
+// ====================================
+
 $("login").addEventListener("submit",async e=>{
  e.preventDefault();
 
@@ -482,15 +660,47 @@ $("login").addEventListener("submit",async e=>{
 
 $("salir").addEventListener("click",async()=>{
  try{
+  // Desvincular este dispositivo de la cuenta
+  // antes de cerrar sesión, si se registró.
+  if(tokenActual && auth.currentUser){
+   try{
+    await deleteDoc(doc(
+     db,
+     "usuarios",
+     auth.currentUser.uid,
+     "dispositivos",
+     idDispositivo()
+    ));
+
+    if(messaging){
+     await deleteToken(messaging);
+    }
+
+    tokenActual=null;
+   }catch(error){
+    console.warn(
+     "No se pudo quitar el registro de avisos.",
+     error
+    );
+   }
+  }
+
   await signOut(auth);
+
   cartas=[];
   $("aviso").textContent="";
   $("contador").textContent="";
+  informarNotificaciones("");
   document.title="Buzón Mágico | Casa-Lumi";
+
  }catch(error){
   informar("No se pudo cerrar sesión.");
  }
 });
+
+// ====================================
+// CARTAS
+// ====================================
 
 $("nueva-carta").addEventListener("submit",async e=>{
  e.preventDefault();
@@ -552,31 +762,11 @@ $("ver-archivo").onclick=()=>{
  mostrar();
 };
 
-$("activar-notificaciones").onclick=async()=>{
- const salida=$("estado-notificaciones");
+$("activar-notificaciones").onclick=activarAvisos;
 
- if(!("Notification" in window)){
-  salida.textContent=
-   "Este navegador no admite notificaciones.";
-  return;
- }
-
- try{
-  const permiso=await Notification.requestPermission();
-
-  if(permiso==="granted"){
-   salida.textContent=
-    "💜 Permiso concedido. Falta conectar Firebase Cloud Messaging para recibir avisos con Casa-Lumi cerrada.";
-  }else{
-   salida.textContent=
-    "Las notificaciones no están autorizadas.";
-  }
-
- }catch(error){
-  salida.textContent=
-   "No se pudo solicitar el permiso.";
- }
-};
+// ====================================
+// SESIÓN Y SINCRONIZACIÓN
+// ====================================
 
 onAuthStateChanged(auth,usuario=>{
  if(cancelarEscucha){
@@ -593,9 +783,12 @@ onAuthStateChanged(auth,usuario=>{
 
  if(!persona){
   cartas=[];
+  tokenActual=null;
+
   $("aviso").textContent="";
   $("contador").textContent="";
   $("cartas").replaceChildren();
+
   document.title="Buzón Mágico | Casa-Lumi";
 
   informar(usuario
@@ -614,6 +807,13 @@ onAuthStateChanged(auth,usuario=>{
  }
 
  informar("Buzón conectado 💜");
+
+ if(Notification.permission==="granted"){
+  informarNotificaciones(
+   "🔔 Permiso concedido. Pulsa Activar avisos " +
+   "para registrar este celular."
+  );
+ }
 
  const consulta=query(
   cartasRef,
