@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="es">
 <head>
@@ -98,6 +97,10 @@ button:hover:not(:disabled){background:#a46bd2}
  border-radius:20px;
  font-size:13px;
 }
+button.activo{
+ background:#bb83e7;
+ color:#20122e;
+}
 </style>
 </head>
 
@@ -132,7 +135,9 @@ button:hover:not(:disabled){background:#a46bd2}
 
 <section class="panel">
  <p id="usuario"></p>
- <button id="salir">Cerrar sesión</button>
+ <button id="salir" type="button">
+  Cerrar sesión
+ </button>
 </section>
 
 <section class="panel">
@@ -176,9 +181,9 @@ button:hover:not(:disabled){background:#a46bd2}
 <section class="panel">
  <h2>🔔 Notificaciones</h2>
  <p>
-  Tus cartas seguirán pendientes aunque
-  las leas. El aviso desaparecerá del contador
-  cuando envíes tu respuesta.
+  Las cartas permanecerán pendientes aunque
+  las leas. El contador se actualizará
+  cuando respondas.
  </p>
  <button id="activar-notificaciones" type="button">
   🔔 Activar avisos
@@ -194,23 +199,26 @@ button:hover:not(:disabled){background:#a46bd2}
 
 <p class="nota">
  Las cartas se guardan en Cloud Firestore.
- Las notificaciones externas requieren
- configurar Firebase Cloud Messaging.
+ Los avisos externos requieren configurar
+ Firebase Cloud Messaging.
 </p>
 
 </main>
 
 <script type="module">
-import {initializeApp} from
- "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+
+import {
+ getApp,
+ getApps,
+ initializeApp
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 
 import {
  getAuth,
  signInWithEmailAndPassword,
  signOut,
  onAuthStateChanged
-} from
- "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 
 import {
  getFirestore,
@@ -222,18 +230,22 @@ import {
  query,
  orderBy,
  runTransaction
-} from
- "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-import {firebaseConfig} from "../firebase-config.js";
+import {
+ firebaseConfig
+} from "../firebase-config.js";
 
-// CAMBIAR POR LOS UID REALES DE FIREBASE AUTHENTICATION
+// CUENTAS OFICIALES DEL BUZÓN
 const USUARIOS = {
- "UID_DE_CONY": "Cony",
- "UID_DE_YARIN": "Yarin"
+ "V8sDSqTd6RNzpTtysN4Qo3rvOdI3": "Cony",
+ "dXP90jsZJOQswVSqhctV3fuyQm42": "Yarin"
 };
 
-const app=initializeApp(firebaseConfig);
+const app=getApps().length
+ ? getApp()
+ : initializeApp(firebaseConfig);
+
 const auth=getAuth(app);
 const db=getFirestore(app);
 
@@ -284,9 +296,25 @@ function estadoCarta(c){
   : "pendiente";
 }
 
+function actualizarFiltros(){
+ const botones={
+  pendientes:$("ver-pendientes"),
+  todas:$("ver-todas"),
+  archivo:$("ver-archivo")
+ };
+
+ Object.entries(botones).forEach(([nombre,b])=>{
+  const activo=nombre===filtro;
+  b.classList.toggle("activo",activo);
+  b.setAttribute("aria-pressed",String(activo));
+ });
+}
+
 function mostrar(){
  const contenedor=$("cartas");
  contenedor.replaceChildren();
+
+ actualizarFiltros();
 
  const pendientes=cartas.filter(c=>
   c.destinatario===persona &&
@@ -325,7 +353,7 @@ function mostrar(){
   const caja=crear("article",undefined,"carta");
 
   caja.append(
-   crear("h3","💜 "+c.titulo)
+   crear("h3","💜 "+(c.titulo||"Sin título"))
   );
 
   caja.append(
@@ -337,25 +365,19 @@ function mostrar(){
   );
 
   caja.append(
-   crear("p",c.mensaje,"contenido")
+   crear("p",c.mensaje||"","contenido")
   );
 
-  const respuestas=c.respuestas||[];
+  const respuestas=Array.isArray(c.respuestas)
+   ? c.respuestas
+   : [];
 
   respuestas.forEach(r=>{
    const bloque=crear("div",undefined,"respuesta");
 
-   bloque.append(
-    crear("strong",r.autor)
-   );
-
-   bloque.append(
-    crear("p",r.mensaje,"contenido")
-   );
-
-   bloque.append(
-    crear("small",r.fecha,"fecha")
-   );
+   bloque.append(crear("strong",r.autor));
+   bloque.append(crear("p",r.mensaje,"contenido"));
+   bloque.append(crear("small",r.fecha,"fecha"));
 
    caja.append(bloque);
   });
@@ -379,7 +401,10 @@ function mostrar(){
    const responder=boton("💌 Responder",async()=>{
     const mensaje=campo.value.trim();
 
-    if(!mensaje)return;
+    if(!mensaje){
+     informar("Escribe una respuesta primero.");
+     return;
+    }
 
     responder.disabled=true;
 
@@ -433,6 +458,9 @@ function mostrar(){
 $("login").addEventListener("submit",async e=>{
  e.preventDefault();
 
+ const enviar=e.submitter;
+ if(enviar)enviar.disabled=true;
+
  try{
   await signInWithEmailAndPassword(
    auth,
@@ -441,18 +469,24 @@ $("login").addEventListener("submit",async e=>{
   );
 
   $("clave").value="";
-  informar("Sesión iniciada.");
+  informar("Sesión iniciada. 💜");
 
  }catch(error){
   informar(
    "No se pudo iniciar sesión. Revisa tus datos."
   );
+ }finally{
+  if(enviar)enviar.disabled=false;
  }
 });
 
 $("salir").addEventListener("click",async()=>{
  try{
   await signOut(auth);
+  cartas=[];
+  $("aviso").textContent="";
+  $("contador").textContent="";
+  document.title="Buzón Mágico | Casa-Lumi";
  }catch(error){
   informar("No se pudo cerrar sesión.");
  }
@@ -460,6 +494,11 @@ $("salir").addEventListener("click",async()=>{
 
 $("nueva-carta").addEventListener("submit",async e=>{
  e.preventDefault();
+
+ if(!auth.currentUser || !persona){
+  informar("Debes iniciar sesión.");
+  return;
+ }
 
  const destinatario=$("destinatario").value;
  const titulo=$("titulo").value.trim();
@@ -473,7 +512,7 @@ $("nueva-carta").addEventListener("submit",async e=>{
  }
 
  const enviar=e.submitter;
- enviar.disabled=true;
+ if(enviar)enviar.disabled=true;
 
  try{
   await addDoc(cartasRef,{
@@ -494,7 +533,7 @@ $("nueva-carta").addEventListener("submit",async e=>{
   informar("Error al enviar: "+error.message);
 
  }finally{
-  enviar.disabled=false;
+  if(enviar)enviar.disabled=false;
  }
 });
 
@@ -546,20 +585,18 @@ onAuthStateChanged(auth,usuario=>{
  }
 
  persona=usuario
-  ? USUARIOS[usuario.uid]
+  ? USUARIOS[usuario.uid]||null
   : null;
 
- $("acceso").classList.toggle(
-  "oculto",!!persona
- );
-
- $("privado").classList.toggle(
-  "oculto",!persona
- );
+ $("acceso").classList.toggle("oculto",!!persona);
+ $("privado").classList.toggle("oculto",!persona);
 
  if(!persona){
   cartas=[];
   $("aviso").textContent="";
+  $("contador").textContent="";
+  $("cartas").replaceChildren();
+  document.title="Buzón Mágico | Casa-Lumi";
 
   informar(usuario
    ? "Esta cuenta no está autorizada."
@@ -568,8 +605,13 @@ onAuthStateChanged(auth,usuario=>{
   return;
  }
 
- $("usuario").textContent=
-  "🌙 Sesión de "+persona;
+ $("usuario").textContent="🌙 Sesión de "+persona;
+
+ const opciones=$("destinatario").options;
+
+ for(const opcion of opciones){
+  opcion.disabled=opcion.value===persona;
+ }
 
  informar("Buzón conectado 💜");
 
@@ -587,6 +629,7 @@ onAuthStateChanged(auth,usuario=>{
    }));
 
    mostrar();
+   informar("Buzón actualizado 💜");
   },
   error=>{
    informar(
@@ -595,6 +638,7 @@ onAuthStateChanged(auth,usuario=>{
   }
  );
 });
+
 </script>
 </body>
 </html>
