@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#160b25">
+<title>Sala de Afinación | Casa-Lumi</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(
+    circle at top,
+    #4a2865,
+    #160b25 75%
+  );
+  color: #f8efff;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+main {
+  max-width: 680px;
+  margin: auto;
+  padding: 22px 14px 60px;
+}
+
+h1 { color: #e6bbff; }
+h2 { color: #d4a4ff; }
+
+.volver {
+  display: inline-block;
+  margin-bottom: 18px;
+  color: #e9c6ff;
+  text-decoration: none;
+}
+
+.panel {
+  background: #29183d;
+  border: 2px solid #8657ac;
+  border-radius: 26px;
+  padding: 22px 14px;
+  margin: 20px 0;
+  box-shadow: 0 0 22px #9b54d033;
+}
+
+.decoracion {
+  font-size: 48px;
+  margin: 15px 0;
+}
+
+button, select {
+  background: #613078;
+  color: white;
+  border: 2px solid #b77bdf;
+  border-radius: 15px;
+  padding: 13px 17px;
+  margin: 6px;
+  font-size: 16px;
+}
+
+button { cursor: pointer; }
+
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+select {
+  width: 90%;
+  max-width: 350px;
+}
+
+.nota {
+  font-size: 75px;
+  font-weight: bold;
+  color: #e6bbff;
+  margin: 15px 0;
+}
+
+.frecuencia {
+  color: #d2b7e5;
+  font-size: 16px;
+}
+
+.medidor {
+  position: relative;
+  height: 24px;
+  margin: 35px auto 12px;
+  max-width: 400px;
+  background: linear-gradient(
+    90deg,
+    #e35d78,
+    #d7ad48,
+    #50d69a,
+    #d7ad48,
+    #e35d78
+  );
+  border-radius: 30px;
+}
+
+.aguja {
+  position: absolute;
+  width: 5px;
+  height: 45px;
+  background: white;
+  top: -11px;
+  left: 50%;
+  border-radius: 4px;
+  transform: translateX(-50%);
+  transition: left .12s ease;
+  box-shadow: 0 0 8px white;
+}
+
+.escala {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #dac8e8;
+}
+
+.estado {
+  font-size: 20px;
+  min-height: 55px;
+  margin-top: 24px;
+  font-weight: bold;
+}
+
+.cuerdas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 9px;
+  margin: 20px 0;
+}
+
+.cuerda {
+  min-width: 55px;
+  padding: 12px;
+  background: #3b2355;
+  border: 2px solid #78529c;
+  border-radius: 13px;
+}
+
+.cuerda.activa {
+  background: #75429b;
+  border-color: #e8bdff;
+  box-shadow: 0 0 13px #bb7aff;
+}
+
+.afinada {
+  color: #75f3b6;
+}
+
+footer {
+  color: #baa1cc;
+  font-size: 13px;
+  margin-top: 30px;
+}
+</style>
+</head>
+
+<body>
+<main>
+
+<a class="volver" href="../index.html">
+  ← Volver a Casa-Lumi
+</a>
+
+<h1>🎸 Sala de Afinación</h1>
+<p>Un rincón musical de Casa-Lumi 💜</p>
+
+<div class="panel">
+  <div class="decoracion">🎸 ✨ 🎵</div>
+
+  <h2>Elige tu instrumento</h2>
+
+  <select id="instrumento">
+    <option value="electrica">
+      🎸 Guitarra eléctrica
+    </option>
+    <option value="acustica">
+      🎶 Guitarra acústica
+    </option>
+    <option value="bajo">
+      🎸 Bajo de 4 cuerdas
+    </option>
+  </select>
+
+  <h2>Cuerdas</h2>
+  <div id="cuerdas" class="cuerdas"></div>
+</div>
+
+<div class="panel">
+  <h2>✨ Afinador mágico ✨</h2>
+
+  <div id="nota" class="nota">--</div>
+
+  <div id="frecuencia" class="frecuencia">
+    Esperando sonido...
+  </div>
+
+  <div class="medidor">
+    <div id="aguja" class="aguja"></div>
+  </div>
+
+  <div class="escala">
+    <span>♭ Grave</span>
+    <span>✓ Afinado</span>
+    <span>♯ Agudo</span>
+  </div>
+
+  <div id="estado" class="estado">
+    Presiona iniciar para comenzar 💜
+  </div>
+
+  <button id="iniciar">
+    🎤 Iniciar afinador
+  </button>
+
+  <button id="detener" disabled>
+    ⏹ Detener
+  </button>
+</div>
+
+<footer>
+  Casa-Lumi 💜 Sala musical
+</footer>
+
+</main>
+
+<script>
+"use strict";
+
+const instrumentos = {
+  electrica: [
+    ["E2", 82.41],
+    ["A2", 110],
+    ["D3", 146.83],
+    ["G3", 196],
+    ["B3", 246.94],
+    ["E4", 329.63]
+  ],
+  acustica: [
+    ["E2", 82.41],
+    ["A2", 110],
+    ["D3", 146.83],
+    ["G3", 196],
+    ["B3", 246.94],
+    ["E4", 329.63]
+  ],
+  bajo: [
+    ["E1", 41.20],
+    ["A1", 55],
+    ["D2", 73.42],
+    ["G2", 98]
+  ]
+};
+
+const instrumento =
+  document.getElementById("instrumento");
+
+const cuerdas =
+  document.getElementById("cuerdas");
+
+const nota =
+  document.getElementById("nota");
+
+const frecuencia =
+  document.getElementById("frecuencia");
+
+const aguja =
+  document.getElementById("aguja");
+
+const estado =
+  document.getElementById("estado");
+
+const iniciar =
+  document.getElementById("iniciar");
+
+const detener =
+  document.getElementById("detener");
+
+let audioContext = null;
+let analyser = null;
+let stream = null;
+let source = null;
+let animacion = null;
+let buffer = null;
+
+function mostrarCuerdas(activa = "") {
+  cuerdas.innerHTML = "";
+
+  instrumentos[instrumento.value].forEach(
+    ([nombre]) => {
+      const elemento = document.createElement("div");
+      elemento.className = "cuerda";
+      elemento.textContent = nombre;
+
+      if (nombre === activa) {
+        elemento.classList.add("activa");
+      }
+
+      cuerdas.appendChild(elemento);
+    }
+  );
+}
+
+function detectarFrecuencia(datos, sampleRate) {
+  const tamaño = datos.length;
+
+  let energia = 0;
+
+  for (let i = 0; i < tamaño; i++) {
+    energia += datos[i] * datos[i];
+  }
+
+  const rms = Math.sqrt(energia / tamaño);
+
+  if (rms < 0.012) return -1;
+
+  const minHz = 35;
+  const maxHz = 380;
+
+  const minLag = Math.floor(sampleRate / maxHz);
+  const maxLag = Math.min(
+    Math.floor(sampleRate / minHz),
+    Math.floor(tamaño / 2)
+  );
+
+  const diferencias = new Float32Array(maxLag + 1);
+  let suma = 0;
+  let mejorLag = -1;
+  let mejorValor = 1;
+
+  for (let lag = 1; lag <= maxLag; lag++) {
+    let diferencia = 0;
+
+    for (let i = 0; i < tamaño - lag; i++) {
+      const delta = datos[i] - datos[i + lag];
+      diferencia += delta * delta;
+    }
+
+    diferencias[lag] = diferencia;
+    suma += diferencia;
+
+    if (lag < minLag || suma === 0) continue;
+
+    const valor = diferencia * lag / suma;
+
+    if (valor < 0.18 && valor < mejorValor) {
+      mejorValor = valor;
+      mejorLag = lag;
+    }
+  }
+
+  if (mejorLag === -1) return -1;
+
+  const frecuenciaDetectada = sampleRate / mejorLag;
+
+  return Number.isFinite(frecuenciaDetectada)
+    ? frecuenciaDetectada
+    : -1;
+}
+
+function encontrarNota(hz) {
+  const notas = instrumentos[instrumento.value];
+
+  let mejor = null;
+  let menorDiferencia = Infinity;
+
+  notas.forEach(([nombre, objetivo]) => {
+    const cents = 1200 * Math.log2(hz / objetivo);
+    const diferencia = Math.abs(cents);
+
+    if (diferencia < menorDiferencia) {
+      menorDiferencia = diferencia;
+      mejor = { nombre, objetivo, cents };
+    }
+  });
+
+  return mejor;
+}
+
+function actualizarAfinador() {
+  if (!analyser || !audioContext) return;
+
+  analyser.getFloatTimeDomainData(buffer);
+
+  const hz = detectarFrecuencia(
+    buffer,
+    audioContext.sampleRate
+  );
+
+  if (hz > 0) {
+    const resultado = encontrarNota(hz);
+    const cents = resultado.cents;
+
+    nota.textContent = resultado.nombre;
+
+    frecuencia.textContent =
+      hz.toFixed(1) + " Hz";
+
+    mostrarCuerdas(resultado.nombre);
+
+    const posicion = Math.max(
+      0,
+      Math.min(100, 50 + cents / 2)
+    );
+
+    aguja.style.left = posicion + "%";
+
+    estado.classList.remove("afinada");
+
+    if (Math.abs(cents) <= 5) {
+      estado.textContent = "💚 ¡Cuerda afinada!";
+      estado.classList.add("afinada");
+    } else if (cents < 0) {
+      estado.textContent =
+        "♭ Está grave: sube un poquito";
+    } else {
+      estado.textContent =
+        "♯ Está aguda: baja un poquito";
+    }
+  } else {
+    nota.textContent = "--";
+    frecuencia.textContent = "Escuchando...";
+    estado.textContent = "🎵 Toca una cuerda";
+    aguja.style.left = "50%";
+    mostrarCuerdas();
+  }
+
+  animacion = requestAnimationFrame(
+    actualizarAfinador
+  );
+}
+
+async function iniciarAfinador() {
+  if (audioContext) return;
+
+  iniciar.disabled = true;
+  estado.textContent = "Solicitando micrófono...";
+
+  try {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      throw new Error("Micrófono no disponible");
+    }
+
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false
+      },
+      video: false
+    });
+
+    audioContext = new (
+      window.AudioContext ||
+      window.webkitAudioContext
+    )();
+
+    await audioContext.resume();
+
+    source = audioContext.createMediaStreamSource(stream);
+
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 8192;
+    analyser.smoothingTimeConstant = 0;
+
+    source.connect(analyser);
+
+    buffer = new Float32Array(analyser.fftSize);
+
+    detener.disabled = false;
+    estado.textContent = "🎵 Toca una cuerda";
+
+    actualizarAfinador();
+
+  } catch (error) {
+    console.error(error);
+
+    estado.textContent =
+      "No se pudo acceder al micrófono.";
+
+    detenerAfinador();
+  }
+}
+
+function detenerAfinador() {
+  if (animacion !== null) {
+    cancelAnimationFrame(animacion);
+    animacion = null;
+  }
+
+  if (source) {
+    source.disconnect();
+    source = null;
+  }
+
+  if (stream) {
+    stream.getTracks().forEach(
+      track => track.stop()
+    );
+    stream = null;
+  }
+
+  if (audioContext) {
+    audioContext.close();
+    audioContext = null;
+  }
+
+  analyser = null;
+  buffer = null;
+
+  iniciar.disabled = false;
+  detener.disabled = true;
+
+  nota.textContent = "--";
+  frecuencia.textContent = "Micrófono apagado";
+  estado.textContent = "Afinador detenido 💜";
+  aguja.style.left = "50%";
+
+  mostrarCuerdas();
+}
+
+iniciar.addEventListener(
+  "click",
+  iniciarAfinador
+);
+
+detener.addEventListener(
+  "click",
+  detenerAfinador
+);
+
+instrumento.addEventListener("change", () => {
+  mostrarCuerdas();
+  nota.textContent = "--";
+  aguja.style.left = "50%";
+});
+
+mostrarCuerdas();
+</script>
+
+</body>
+</html>
