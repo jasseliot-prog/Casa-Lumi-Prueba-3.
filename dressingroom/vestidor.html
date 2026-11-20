@@ -153,6 +153,52 @@ button.activo{
  font-size:13px;
 }
 
+/* ==================================
+   NUEVO: DIÁLOGOS DE LUMI
+   ================================== */
+
+.dialogo-lumi{
+ margin:14px 2px 5px;
+ padding:12px 9px;
+ min-height:75px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ background:linear-gradient(
+  145deg,
+  #49265f,
+  #342044
+ );
+ border:1px solid #b783f5;
+ border-radius:17px;
+ color:#f5dfff;
+ font-size:13px;
+ font-weight:600;
+ line-height:1.5;
+ text-align:center;
+ overflow-wrap:anywhere;
+ box-shadow:0 0 12px #a77cdb33;
+}
+
+.dialogo-lumi.animar{
+ animation:aparecerDialogo .4s ease;
+}
+
+@keyframes aparecerDialogo{
+ from{
+  opacity:0;
+  transform:translateY(6px);
+ }
+ to{
+  opacity:1;
+  transform:translateY(0);
+ }
+}
+
+/* ==================================
+   ADAPTACIÓN A CELULARES
+   ================================== */
+
 @media(max-width:360px){
  .casilleros{
   gap:6px;
@@ -163,10 +209,15 @@ button.activo{
  .casillero h3{
   font-size:14px;
  }
+ .dialogo-lumi{
+  font-size:12px;
+  padding:9px 5px;
+ }
 }
 
 @media(prefers-reduced-motion:reduce){
- .personaje{
+ .personaje,
+ .dialogo-lumi.animar{
   animation:none;
  }
 }
@@ -227,6 +278,17 @@ button.activo{
     class="aviso"
     role="status"
    ></p>
+
+   <!-- NUEVO: FRASE DEBAJO DEL GIF -->
+
+   <div
+    id="dialogo-lumi"
+    class="dialogo-lumi"
+    aria-live="polite"
+   >
+    ✨ Estoy disfrutando mi día.
+   </div>
+
   </div>
 
  </div>
@@ -347,7 +409,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  };
 
  // ==================================
- // FRASES DE CADA EMOCIÓN
+ // FRASES ORIGINALES
  // ==================================
 
  const frases={
@@ -359,6 +421,86 @@ document.addEventListener("DOMContentLoaded",()=>{
   somnolienta:"Creo que tengo sueño...",
   emocionada:"¡Qué emoción!"
  };
+
+ // ==================================
+ // NUEVO: DIÁLOGOS DE LUMI
+ // ==================================
+
+ const dialogosLumi={
+
+  feliz:[
+   "¡Hoy tengo muchas ganas de hacer cosas bonitas!",
+   "¡Qué alegría! Hoy será un día especial.",
+   "¡Me encanta estar así de contenta!"
+  ],
+
+  triste:[
+   "Hoy necesito un poquito de tranquilidad.",
+   "A veces también tengo días tristes.",
+   "Voy a darme tiempo para sentirme mejor."
+  ],
+
+  enojada:[
+   "¡Grrr! Voy a tomarme un momento.",
+   "Necesito un poquito de espacio.",
+   "¡Estoy molesta! Mejor me tranquilizo."
+  ],
+
+  sorprendida:[
+   "¡Wow! ¡Eso no me lo esperaba!",
+   "¡Ohhh! ¡Qué sorpresa tan grande!",
+   "¡No puedo creer lo que acaba de pasar!"
+  ],
+
+  tranquila:[
+   "Qué agradable es disfrutar de un momento de paz.",
+   "Estoy disfrutando de mi tranquilidad.",
+   "Hoy quiero hacer todo con calma."
+  ],
+
+  somnolienta:[
+   "Creo que necesito una siestita...",
+   "Mis ojitos ya quieren descansar.",
+   "Cinco minutitos más, por favor..."
+  ],
+
+  emocionada:[
+   "¡Tengo tantas cosas que quiero hacer!",
+   "¡No puedo contener mi emoción!",
+   "¡Esto será una aventura maravillosa!"
+  ]
+
+ };
+
+ // ==================================
+ // NUEVO: MOSTRAR DIÁLOGO
+ // ==================================
+
+ function mostrarDialogoLumi(emocion){
+
+  const elemento=document.getElementById(
+   "dialogo-lumi"
+  );
+
+  if(!elemento)return;
+
+  const opciones=dialogosLumi[emocion];
+
+  if(!opciones)return;
+
+  const indice=Math.floor(
+   Math.random()*opciones.length
+  );
+
+  elemento.textContent=opciones[indice];
+
+  elemento.classList.remove("animar");
+
+  void elemento.offsetWidth;
+
+  elemento.classList.add("animar");
+
+ }
 
  // ==================================
  // ARCHIVOS REALES DE VERANO
@@ -639,6 +781,9 @@ document.addEventListener("DOMContentLoaded",()=>{
 
   emocionTexto.textContent=emociones[id];
   frase.textContent=frases[id];
+
+  // NUEVO: CAMBIAR EL DIÁLOGO
+  mostrarDialogoLumi(id);
 
   actualizarBotones(
    "opciones-emociones",
@@ -1025,3 +1170,4 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 </body>
 </html>
+
