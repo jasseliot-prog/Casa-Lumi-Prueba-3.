@@ -1,164 +1,189 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#160b25">
 <title>Sala de Afinación | Casa-Lumi</title>
 
 <style>
-* { box-sizing: border-box; }
+*{box-sizing:border-box}
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: radial-gradient(
-    circle at top,
-    #4a2865,
-    #160b25 75%
-  );
-  color: #f8efff;
-  font-family: Arial, sans-serif;
-  text-align: center;
+body{
+ margin:0;
+ min-height:100vh;
+ background:radial-gradient(circle at top,#4a2865,#160b25 75%);
+ color:#f8efff;
+ font-family:Arial,sans-serif;
+ text-align:center;
 }
 
-main {
-  max-width: 680px;
-  margin: auto;
-  padding: 22px 14px 60px;
+main{
+ max-width:680px;
+ margin:auto;
+ padding:22px 14px 60px;
 }
 
-h1 { color: #e6bbff; }
-h2 { color: #d4a4ff; }
+h1{color:#e6bbff}
+h2{color:#d4a4ff}
 
-.volver {
-  display: inline-block;
-  margin-bottom: 18px;
-  color: #e9c6ff;
-  text-decoration: none;
+.volver{
+ display:inline-block;
+ margin-bottom:18px;
+ color:#e9c6ff;
+ text-decoration:none;
 }
 
-.panel {
-  background: #29183d;
-  border: 2px solid #8657ac;
-  border-radius: 26px;
-  padding: 22px 14px;
-  margin: 20px 0;
-  box-shadow: 0 0 22px #9b54d033;
+.panel{
+ background:#29183d;
+ border:2px solid #8657ac;
+ border-radius:26px;
+ padding:22px 14px;
+ margin:20px 0;
+ box-shadow:0 0 22px #9b54d033;
 }
 
-.decoracion {
-  font-size: 48px;
-  margin: 15px 0;
+.decoracion{
+ font-size:48px;
+ margin:15px 0;
 }
 
-button, select {
-  background: #613078;
-  color: white;
-  border: 2px solid #b77bdf;
-  border-radius: 15px;
-  padding: 13px 17px;
-  margin: 6px;
-  font-size: 16px;
+button,select{
+ background:#613078;
+ color:white;
+ border:2px solid #b77bdf;
+ border-radius:15px;
+ padding:13px 17px;
+ margin:6px;
+ font-size:16px;
+ font-family:inherit;
 }
 
-button { cursor: pointer; }
+button{cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
 
-button:disabled {
-  opacity: .5;
-  cursor: not-allowed;
+button:focus-visible,select:focus-visible{
+ outline:3px solid #e6bbff;
+ outline-offset:3px;
 }
 
-select {
-  width: 90%;
-  max-width: 350px;
+select{
+ width:90%;
+ max-width:350px;
 }
 
-.nota {
-  font-size: 75px;
-  font-weight: bold;
-  color: #e6bbff;
-  margin: 15px 0;
+.nota{
+ font-size:75px;
+ font-weight:bold;
+ color:#e6bbff;
+ margin:15px 0;
 }
 
-.frecuencia {
-  color: #d2b7e5;
-  font-size: 16px;
+.frecuencia{
+ color:#d2b7e5;
+ font-size:16px;
 }
 
-.medidor {
-  position: relative;
-  height: 24px;
-  margin: 35px auto 12px;
-  max-width: 400px;
-  background: linear-gradient(
-    90deg,
-    #e35d78,
-    #d7ad48,
-    #50d69a,
-    #d7ad48,
-    #e35d78
-  );
-  border-radius: 30px;
+.medidor{
+ position:relative;
+ height:24px;
+ margin:35px auto 12px;
+ max-width:400px;
+ background:linear-gradient(
+ 90deg,
+ #e35d78,
+ #d7ad48,
+ #50d69a,
+ #d7ad48,
+ #e35d78
+ );
+ border-radius:30px;
 }
 
-.aguja {
-  position: absolute;
-  width: 5px;
-  height: 45px;
-  background: white;
-  top: -11px;
-  left: 50%;
-  border-radius: 4px;
-  transform: translateX(-50%);
-  transition: left .12s ease;
-  box-shadow: 0 0 8px white;
+.aguja{
+ position:absolute;
+ width:5px;
+ height:45px;
+ background:white;
+ top:-11px;
+ left:50%;
+ border-radius:4px;
+ transform:translateX(-50%);
+ transition:left .15s ease;
+ box-shadow:0 0 8px white;
 }
 
-.escala {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  color: #dac8e8;
+.escala{
+ display:flex;
+ justify-content:space-between;
+ font-size:13px;
+ color:#dac8e8;
 }
 
-.estado {
-  font-size: 20px;
-  min-height: 55px;
-  margin-top: 24px;
-  font-weight: bold;
+.estado{
+ font-size:20px;
+ min-height:55px;
+ margin-top:24px;
+ font-weight:bold;
 }
 
-.cuerdas {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 9px;
-  margin: 20px 0;
+.cuerdas{
+ display:flex;
+ flex-wrap:wrap;
+ justify-content:center;
+ gap:9px;
+ margin:20px 0;
 }
 
-.cuerda {
-  min-width: 55px;
-  padding: 12px;
-  background: #3b2355;
-  border: 2px solid #78529c;
-  border-radius: 13px;
+.cuerda{
+ min-width:55px;
+ padding:12px;
+ background:#3b2355;
+ border:2px solid #78529c;
+ border-radius:13px;
 }
 
-.cuerda.activa {
-  background: #75429b;
-  border-color: #e8bdff;
-  box-shadow: 0 0 13px #bb7aff;
+.cuerda.activa{
+ background:#75429b;
+ border-color:#e8bdff;
+ box-shadow:0 0 13px #bb7aff;
 }
 
-.afinada {
-  color: #75f3b6;
+.afinada{color:#75f3b6}
+
+.modo{
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ gap:8px;
+ flex-wrap:wrap;
+ margin:15px 0;
 }
 
-footer {
-  color: #baa1cc;
-  font-size: 13px;
-  margin-top: 30px;
+.modo input{
+ accent-color:#bb7aff;
+ width:18px;
+ height:18px;
+}
+
+.detalle{
+ color:#cdb3e0;
+ font-size:14px;
+ line-height:1.6;
+}
+
+.cents{
+ color:#e6bbff;
+ font-size:16px;
+ margin-top:12px;
+ font-weight:bold;
+}
+
+footer{
+ color:#baa1cc;
+ font-size:13px;
+ margin-top:30px;
 }
 </style>
 </head>
@@ -167,380 +192,592 @@ footer {
 <main>
 
 <a class="volver" href="../index.html">
-  ← Volver a Casa-Lumi
+ ← Volver a Casa-Lumi
 </a>
 
 <h1>🎸 Sala de Afinación</h1>
 <p>Un rincón musical de Casa-Lumi 💜</p>
 
 <div class="panel">
-  <div class="decoracion">🎸 ✨ 🎵</div>
+ <div class="decoracion">🎸 ✨ 🎵</div>
 
-  <h2>Elige tu instrumento</h2>
+ <h2>Elige tu instrumento</h2>
 
-  <select id="instrumento">
-    <option value="electrica">
-      🎸 Guitarra eléctrica
-    </option>
-    <option value="acustica">
-      🎶 Guitarra acústica
-    </option>
-    <option value="bajo">
-      🎸 Bajo de 4 cuerdas
-    </option>
-  </select>
+ <select id="instrumento">
+  <option value="electrica">🎸 Guitarra eléctrica</option>
+  <option value="acustica">🎶 Guitarra acústica</option>
+  <option value="bajo">🎸 Bajo de 4 cuerdas</option>
+ </select>
 
-  <h2>Cuerdas</h2>
-  <div id="cuerdas" class="cuerdas"></div>
+ <h2>Cuerdas</h2>
+
+ <label class="modo">
+  <input type="checkbox" id="automatico" checked>
+  Detectar cuerda automáticamente
+ </label>
+
+ <p class="detalle" id="instruccion">
+  Toca una cuerda al aire, una a la vez.
+ </p>
+
+ <div id="cuerdas" class="cuerdas"></div>
 </div>
 
 <div class="panel">
-  <h2>✨ Afinador mágico ✨</h2>
+ <h2>✨ Afinador mágico ✨</h2>
 
-  <div id="nota" class="nota">--</div>
+ <div id="nota" class="nota">--</div>
 
-  <div id="frecuencia" class="frecuencia">
-    Esperando sonido...
-  </div>
+ <div id="frecuencia" class="frecuencia">
+  Esperando sonido...
+ </div>
 
-  <div class="medidor">
-    <div id="aguja" class="aguja"></div>
-  </div>
+ <div class="medidor">
+  <div id="aguja" class="aguja"></div>
+ </div>
 
-  <div class="escala">
-    <span>♭ Grave</span>
-    <span>✓ Afinado</span>
-    <span>♯ Agudo</span>
-  </div>
+ <div class="escala">
+  <span>♭ Grave</span>
+  <span>✓ Afinado</span>
+  <span>♯ Agudo</span>
+ </div>
 
-  <div id="estado" class="estado">
-    Presiona iniciar para comenzar 💜
-  </div>
+ <div id="cents" class="cents">0 cents</div>
 
-  <button id="iniciar">
-    🎤 Iniciar afinador
-  </button>
+ <div id="estado" class="estado" role="status">
+  Presiona iniciar para comenzar 💜
+ </div>
 
-  <button id="detener" disabled>
-    ⏹ Detener
-  </button>
+ <button id="iniciar">🎤 Iniciar afinador</button>
+ <button id="detener" disabled>⏹ Detener</button>
+
+ <p class="detalle">
+  Afinación estándar A4 = 440 Hz.
+  Usa un ambiente silencioso y toca
+  una sola cuerda cada vez.
+ </p>
 </div>
 
-<footer>
-  Casa-Lumi 💜 Sala musical
-</footer>
+<footer>Casa-Lumi 💜 Sala musical</footer>
 
 </main>
 
 <script>
 "use strict";
 
+/* =====================================
+   CASA-LUMI
+   SALA DE AFINACIÓN
+   VERSIÓN CORREGIDA
+   ===================================== */
+
 const instrumentos = {
-  electrica: [
-    ["E2", 82.41],
-    ["A2", 110],
-    ["D3", 146.83],
-    ["G3", 196],
-    ["B3", 246.94],
-    ["E4", 329.63]
-  ],
-  acustica: [
-    ["E2", 82.41],
-    ["A2", 110],
-    ["D3", 146.83],
-    ["G3", 196],
-    ["B3", 246.94],
-    ["E4", 329.63]
-  ],
-  bajo: [
-    ["E1", 41.20],
-    ["A1", 55],
-    ["D2", 73.42],
-    ["G2", 98]
-  ]
+ electrica:[
+  ["E2",82.4069],
+  ["A2",110],
+  ["D3",146.8324],
+  ["G3",195.9977],
+  ["B3",246.9417],
+  ["E4",329.6276]
+ ],
+ acustica:[
+  ["E2",82.4069],
+  ["A2",110],
+  ["D3",146.8324],
+  ["G3",195.9977],
+  ["B3",246.9417],
+  ["E4",329.6276]
+ ],
+ bajo:[
+  ["E1",41.2034],
+  ["A1",55],
+  ["D2",73.4162],
+  ["G2",97.9989]
+ ]
 };
 
-const instrumento =
-  document.getElementById("instrumento");
+const $ = id => document.getElementById(id);
 
-const cuerdas =
-  document.getElementById("cuerdas");
-
-const nota =
-  document.getElementById("nota");
-
-const frecuencia =
-  document.getElementById("frecuencia");
-
-const aguja =
-  document.getElementById("aguja");
-
-const estado =
-  document.getElementById("estado");
-
-const iniciar =
-  document.getElementById("iniciar");
-
-const detener =
-  document.getElementById("detener");
+const instrumento = $("instrumento");
+const automatico = $("automatico");
+const cuerdas = $("cuerdas");
+const instruccion = $("instruccion");
+const nota = $("nota");
+const frecuencia = $("frecuencia");
+const aguja = $("aguja");
+const centsTexto = $("cents");
+const estado = $("estado");
+const iniciar = $("iniciar");
+const detener = $("detener");
 
 let audioContext = null;
 let analyser = null;
 let stream = null;
 let source = null;
-let animacion = null;
 let buffer = null;
+let animacion = null;
 
-function mostrarCuerdas(activa = "") {
-  cuerdas.innerHTML = "";
+let cuerdaElegida = 0;
+let ultimaNota = "";
+let lecturas = [];
+let ultimaActualizacion = 0;
+let iniciando = false;
+let sesion = 0;
 
-  instrumentos[instrumento.value].forEach(
-    ([nombre]) => {
-      const elemento = document.createElement("div");
-      elemento.className = "cuerda";
-      elemento.textContent = nombre;
-
-      if (nombre === activa) {
-        elemento.classList.add("activa");
-      }
-
-      cuerdas.appendChild(elemento);
-    }
-  );
+function notasActuales(){
+ return instrumentos[instrumento.value];
 }
 
-function detectarFrecuencia(datos, sampleRate) {
-  const tamaño = datos.length;
+function mostrarCuerdas(activa = ""){
+ cuerdas.innerHTML = "";
 
-  let energia = 0;
+ notasActuales().forEach(([nombre],indice)=>{
+  const boton = document.createElement("button");
+  boton.className = "cuerda";
+  boton.textContent = nombre;
+  boton.type = "button";
 
-  for (let i = 0; i < tamaño; i++) {
-    energia += datos[i] * datos[i];
+  const seleccionada = automatico.checked
+   ? nombre === activa
+   : indice === cuerdaElegida;
+
+  if(seleccionada){
+   boton.classList.add("activa");
   }
 
-  const rms = Math.sqrt(energia / tamaño);
+  boton.setAttribute("aria-pressed",seleccionada);
 
-  if (rms < 0.012) return -1;
-
-  const minHz = 35;
-  const maxHz = 380;
-
-  const minLag = Math.floor(sampleRate / maxHz);
-  const maxLag = Math.min(
-    Math.floor(sampleRate / minHz),
-    Math.floor(tamaño / 2)
-  );
-
-  const diferencias = new Float32Array(maxLag + 1);
-  let suma = 0;
-  let mejorLag = -1;
-  let mejorValor = 1;
-
-  for (let lag = 1; lag <= maxLag; lag++) {
-    let diferencia = 0;
-
-    for (let i = 0; i < tamaño - lag; i++) {
-      const delta = datos[i] - datos[i + lag];
-      diferencia += delta * delta;
-    }
-
-    diferencias[lag] = diferencia;
-    suma += diferencia;
-
-    if (lag < minLag || suma === 0) continue;
-
-    const valor = diferencia * lag / suma;
-
-    if (valor < 0.18 && valor < mejorValor) {
-      mejorValor = valor;
-      mejorLag = lag;
-    }
-  }
-
-  if (mejorLag === -1) return -1;
-
-  const frecuenciaDetectada = sampleRate / mejorLag;
-
-  return Number.isFinite(frecuenciaDetectada)
-    ? frecuenciaDetectada
-    : -1;
-}
-
-function encontrarNota(hz) {
-  const notas = instrumentos[instrumento.value];
-
-  let mejor = null;
-  let menorDiferencia = Infinity;
-
-  notas.forEach(([nombre, objetivo]) => {
-    const cents = 1200 * Math.log2(hz / objetivo);
-    const diferencia = Math.abs(cents);
-
-    if (diferencia < menorDiferencia) {
-      menorDiferencia = diferencia;
-      mejor = { nombre, objetivo, cents };
-    }
+  boton.addEventListener("click",()=>{
+   automatico.checked = false;
+   cuerdaElegida = indice;
+   reiniciarLecturas();
+   mostrarCuerdas();
+   instruccion.textContent =
+    "Afinando la cuerda " + nombre;
   });
 
-  return mejor;
+  cuerdas.appendChild(boton);
+ });
 }
 
-function actualizarAfinador() {
-  if (!analyser || !audioContext) return;
+function reiniciarLecturas(){
+ lecturas = [];
+ ultimaNota = "";
+ nota.textContent = "--";
+ centsTexto.textContent = "0 cents";
+ aguja.style.left = "50%";
+}
 
-  analyser.getFloatTimeDomainData(buffer);
+function mediana(valores){
+ const ordenados = [...valores].sort((a,b)=>a-b);
+ const mitad = Math.floor(ordenados.length/2);
 
-  const hz = detectarFrecuencia(
-    buffer,
-    audioContext.sampleRate
-  );
+ if(ordenados.length % 2){
+  return ordenados[mitad];
+ }
 
-  if (hz > 0) {
-    const resultado = encontrarNota(hz);
-    const cents = resultado.cents;
+ return (
+  ordenados[mitad-1] + ordenados[mitad]
+ ) / 2;
+}
 
-    nota.textContent = resultado.nombre;
+/* Detección de tono mediante YIN.
+   Busca periodicidad en la señal,
+   reduciendo errores de armónicos.
+*/
 
-    frecuencia.textContent =
-      hz.toFixed(1) + " Hz";
+function detectarFrecuencia(datos,sampleRate){
+ const n = datos.length;
+ let energia = 0;
 
-    mostrarCuerdas(resultado.nombre);
+ for(let i=0;i<n;i++){
+  energia += datos[i]*datos[i];
+ }
 
-    const posicion = Math.max(
-      0,
-      Math.min(100, 50 + cents / 2)
-    );
+ const rms = Math.sqrt(energia/n);
 
-    aguja.style.left = posicion + "%";
+ if(rms < 0.008) return -1;
 
-    estado.classList.remove("afinada");
+ const minHz = 35;
+ const maxHz = 380;
 
-    if (Math.abs(cents) <= 5) {
-      estado.textContent = "💚 ¡Cuerda afinada!";
-      estado.classList.add("afinada");
-    } else if (cents < 0) {
-      estado.textContent =
-        "♭ Está grave: sube un poquito";
-    } else {
-      estado.textContent =
-        "♯ Está aguda: baja un poquito";
-    }
-  } else {
-    nota.textContent = "--";
-    frecuencia.textContent = "Escuchando...";
-    estado.textContent = "🎵 Toca una cuerda";
-    aguja.style.left = "50%";
-    mostrarCuerdas();
+ const minLag = Math.max(
+  2,Math.floor(sampleRate/maxHz)
+ );
+
+ const maxLag = Math.min(
+  Math.floor(sampleRate/minHz),
+  Math.floor(n/2)-1
+ );
+
+ const diferencia = new Float64Array(maxLag+1);
+ const normalizada = new Float64Array(maxLag+1);
+
+ const ventana = n-maxLag;
+
+ for(let lag=1;lag<=maxLag;lag++){
+  let suma = 0;
+
+  for(let i=0;i<ventana;i++){
+   const delta = datos[i]-datos[i+lag];
+   suma += delta*delta;
   }
+
+  diferencia[lag] = suma;
+ }
+
+ let acumulado = 0;
+ normalizada[0] = 1;
+
+ for(let lag=1;lag<=maxLag;lag++){
+  acumulado += diferencia[lag];
+
+  normalizada[lag] = acumulado > 0
+   ? diferencia[lag]*lag/acumulado
+   : 1;
+ }
+
+ const umbral = 0.12;
+ let candidato = -1;
+
+ for(let lag=minLag;lag<=maxLag;lag++){
+  if(normalizada[lag] < umbral){
+   while(
+    lag+1<=maxLag &&
+    normalizada[lag+1]<normalizada[lag]
+   ){
+    lag++;
+   }
+
+   candidato = lag;
+   break;
+  }
+ }
+
+ if(candidato === -1) return -1;
+
+ let lagPreciso = candidato;
+
+ if(candidato>1 && candidato<maxLag){
+  const a = normalizada[candidato-1];
+  const b = normalizada[candidato];
+  const c = normalizada[candidato+1];
+
+  const denominador = a-2*b+c;
+
+  if(Math.abs(denominador)>1e-12){
+   const ajuste = 0.5*(a-c)/denominador;
+   lagPreciso += Math.max(
+    -1,Math.min(1,ajuste)
+   );
+  }
+ }
+
+ const hz = sampleRate/lagPreciso;
+
+ if(!Number.isFinite(hz)) return -1;
+
+ return hz;
+}
+
+function encontrarNota(hz){
+ const notas = notasActuales();
+
+ if(!automatico.checked){
+  const [nombre,objetivo] =
+   notas[cuerdaElegida];
+
+  return {
+   nombre,
+   objetivo,
+   cents:1200*Math.log2(hz/objetivo)
+  };
+ }
+
+ let mejor = null;
+ let diferenciaMenor = Infinity;
+
+ notas.forEach(([nombre,objetivo])=>{
+  const cents = 1200*Math.log2(hz/objetivo);
+  const diferencia = Math.abs(cents);
+
+  if(diferencia<diferenciaMenor){
+   diferenciaMenor = diferencia;
+   mejor = {nombre,objetivo,cents};
+  }
+ });
+
+ // Evita asignar una cuerda cuando
+ // el sonido está demasiado lejos.
+ if(diferenciaMenor>250) return null;
+
+ return mejor;
+}
+
+function actualizarPantalla(hz){
+ const resultado = encontrarNota(hz);
+
+ if(!resultado){
+  estado.textContent =
+   "🎵 No reconozco esa cuerda";
+  return;
+ }
+
+ if(resultado.nombre!==ultimaNota){
+  lecturas = [];
+  ultimaNota = resultado.nombre;
+ }
+
+ lecturas.push(resultado.cents);
+
+ if(lecturas.length>5){
+  lecturas.shift();
+ }
+
+ const cents = mediana(lecturas);
+
+ nota.textContent = resultado.nombre;
+
+ frecuencia.textContent =
+  hz.toFixed(2)+" Hz";
+
+ centsTexto.textContent =
+  (cents>0?"+":"")+
+  cents.toFixed(1)+" cents";
+
+ mostrarCuerdas(resultado.nombre);
+
+ const posicion = Math.max(
+  0,Math.min(100,50+cents/2)
+ );
+
+ aguja.style.left = posicion+"%";
+
+ estado.classList.remove("afinada");
+
+ if(Math.abs(cents)<=5){
+  estado.textContent =
+   "💚 ¡Cuerda afinada!";
+  estado.classList.add("afinada");
+ }else if(cents<0){
+  estado.textContent =
+   "♭ Está grave: sube un poquito";
+ }else{
+  estado.textContent =
+   "♯ Está aguda: baja un poquito";
+ }
+}
+
+function actualizarAfinador(tiempo){
+ if(!analyser || !audioContext) return;
+
+ animacion = requestAnimationFrame(
+  actualizarAfinador
+ );
+
+ // Reduce cálculos para mejorar
+ // rendimiento en celulares.
+ if(tiempo-ultimaActualizacion<100){
+  return;
+ }
+
+ ultimaActualizacion = tiempo;
+
+ analyser.getFloatTimeDomainData(buffer);
+
+ const hz = detectarFrecuencia(
+  buffer,
+  audioContext.sampleRate
+ );
+
+ if(hz>0){
+  actualizarPantalla(hz);
+ }else{
+  nota.textContent = "--";
+  frecuencia.textContent = "Escuchando...";
+  estado.textContent = "🎵 Toca una cuerda";
+  estado.classList.remove("afinada");
+  reiniciarLecturas();
+  mostrarCuerdas();
+ }
+}
+
+async function iniciarAfinador(){
+ if(audioContext || iniciando) return;
+
+ iniciando = true;
+ iniciar.disabled = true;
+
+ const miSesion = ++sesion;
+
+ estado.textContent =
+  "Solicitando permiso del micrófono...";
+
+ let nuevoStream = null;
+ let nuevoContexto = null;
+
+ try{
+  if(!navigator.mediaDevices?.getUserMedia){
+   throw new Error(
+    "El navegador no permite usar el micrófono"
+   );
+  }
+
+  nuevoStream =
+   await navigator.mediaDevices.getUserMedia({
+    audio:{
+     echoCancellation:false,
+     noiseSuppression:false,
+     autoGainControl:false
+    },
+    video:false
+   });
+
+  if(miSesion!==sesion){
+   nuevoStream.getTracks().forEach(t=>t.stop());
+   return;
+  }
+
+  const Contexto =
+   window.AudioContext ||
+   window.webkitAudioContext;
+
+  if(!Contexto){
+   throw new Error("Audio no compatible");
+  }
+
+  nuevoContexto = new Contexto();
+  await nuevoContexto.resume();
+
+  if(miSesion!==sesion){
+   nuevoStream.getTracks().forEach(t=>t.stop());
+   await nuevoContexto.close();
+   return;
+  }
+
+  stream = nuevoStream;
+  audioContext = nuevoContexto;
+
+  source =
+   audioContext.createMediaStreamSource(stream);
+
+  analyser = audioContext.createAnalyser();
+
+  // Ventana grande para frecuencias
+  // graves del bajo eléctrico.
+  analyser.fftSize = 16384;
+  analyser.smoothingTimeConstant = 0;
+
+  source.connect(analyser);
+
+  buffer = new Float32Array(analyser.fftSize);
+
+  ultimaActualizacion = 0;
+  detener.disabled = false;
+
+  estado.textContent = "🎵 Toca una cuerda";
 
   animacion = requestAnimationFrame(
-    actualizarAfinador
+   actualizarAfinador
   );
+
+ }catch(error){
+  console.error(error);
+
+  if(nuevoStream && nuevoStream!==stream){
+   nuevoStream.getTracks().forEach(t=>t.stop());
+  }
+
+  if(nuevoContexto && nuevoContexto!==audioContext){
+   await nuevoContexto.close().catch(()=>{});
+  }
+
+  await detenerAfinador();
+
+  estado.textContent =
+   "⚠️ No se pudo activar el micrófono. Revisa los permisos.";
+
+ }finally{
+  iniciando = false;
+  if(!audioContext) iniciar.disabled = false;
+ }
 }
 
-async function iniciarAfinador() {
-  if (audioContext) return;
+async function detenerAfinador(){
+ ++sesion;
 
-  iniciar.disabled = true;
-  estado.textContent = "Solicitando micrófono...";
+ if(animacion!==null){
+  cancelAnimationFrame(animacion);
+  animacion = null;
+ }
 
-  try {
-    if (!navigator.mediaDevices?.getUserMedia) {
-      throw new Error("Micrófono no disponible");
-    }
+ if(source){
+  source.disconnect();
+  source = null;
+ }
 
-    stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: false,
-        noiseSuppression: false,
-        autoGainControl: false
-      },
-      video: false
-    });
+ if(stream){
+  stream.getTracks().forEach(track=>track.stop());
+  stream = null;
+ }
 
-    audioContext = new (
-      window.AudioContext ||
-      window.webkitAudioContext
-    )();
+ const contexto = audioContext;
+ audioContext = null;
 
-    await audioContext.resume();
+ analyser = null;
+ buffer = null;
 
-    source = audioContext.createMediaStreamSource(stream);
+ if(contexto){
+  await contexto.close().catch(()=>{});
+ }
 
-    analyser = audioContext.createAnalyser();
-    analyser.fftSize = 8192;
-    analyser.smoothingTimeConstant = 0;
+ iniciar.disabled = false;
+ detener.disabled = true;
 
-    source.connect(analyser);
+ reiniciarLecturas();
+ mostrarCuerdas();
 
-    buffer = new Float32Array(analyser.fftSize);
-
-    detener.disabled = false;
-    estado.textContent = "🎵 Toca una cuerda";
-
-    actualizarAfinador();
-
-  } catch (error) {
-    console.error(error);
-
-    estado.textContent =
-      "No se pudo acceder al micrófono.";
-
-    detenerAfinador();
-  }
+ frecuencia.textContent = "Micrófono apagado";
+ estado.textContent = "Afinador detenido 💜";
+ estado.classList.remove("afinada");
 }
 
-function detenerAfinador() {
-  if (animacion !== null) {
-    cancelAnimationFrame(animacion);
-    animacion = null;
-  }
+instrumento.addEventListener("change",()=>{
+ cuerdaElegida = 0;
+ reiniciarLecturas();
+ mostrarCuerdas();
+ estado.textContent = "🎵 Toca una cuerda";
+});
 
-  if (source) {
-    source.disconnect();
-    source = null;
-  }
+automatico.addEventListener("change",()=>{
+ reiniciarLecturas();
+ mostrarCuerdas();
 
-  if (stream) {
-    stream.getTracks().forEach(
-      track => track.stop()
-    );
-    stream = null;
-  }
+ instruccion.textContent = automatico.checked
+  ? "Toca una cuerda al aire, una a la vez."
+  : "Selecciona la cuerda que quieres afinar.";
+});
 
-  if (audioContext) {
-    audioContext.close();
-    audioContext = null;
-  }
+iniciar.addEventListener("click",iniciarAfinador);
+detener.addEventListener("click",detenerAfinador);
 
-  analyser = null;
-  buffer = null;
+window.addEventListener("pagehide",()=>{
+ ++sesion;
 
-  iniciar.disabled = false;
-  detener.disabled = true;
+ if(animacion!==null){
+  cancelAnimationFrame(animacion);
+  animacion = null;
+ }
 
-  nota.textContent = "--";
-  frecuencia.textContent = "Micrófono apagado";
-  estado.textContent = "Afinador detenido 💜";
-  aguja.style.left = "50%";
+ if(stream){
+  stream.getTracks().forEach(t=>t.stop());
+  stream = null;
+ }
 
-  mostrarCuerdas();
-}
-
-iniciar.addEventListener(
-  "click",
-  iniciarAfinador
-);
-
-detener.addEventListener(
-  "click",
-  detenerAfinador
-);
-
-instrumento.addEventListener("change", () => {
-  mostrarCuerdas();
-  nota.textContent = "--";
-  aguja.style.left = "50%";
+ if(audioContext){
+  audioContext.close().catch(()=>{});
+  audioContext = null;
+ }
 });
 
 mostrarCuerdas();
