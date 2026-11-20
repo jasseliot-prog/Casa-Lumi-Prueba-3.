@@ -5,13 +5,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#160b25">
-  <title>Casa-Lumi 2D</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="app.js" defer></script>
+  <meta name="description" content="Casa-Lumi, un pequeño mundo digital mágico.">
+  <title>Casa-Lumi 2D 💜</title>
+
+  <link rel="stylesheet" href="styles.css?v=4">
+  <script src="app.js?v=4" defer></script>
 
   <style>
-    /* Tarjeta del buzón: no modifica las demás */
-    .tarjetas > a.boton-buzon {
+    /* =====================================
+       CASA-LUMI 💜
+       BOTONES Y ENLACES ESPECIALES
+       ===================================== */
+
+    .tarjetas > a.boton-buzon,
+    .tarjetas > a.boton-afinacion,
+    .tarjetas > a.boton-calendario {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -28,164 +36,373 @@
       font-weight: 800;
       text-decoration: none;
       text-align: center;
-      box-shadow: 0 0 22px rgba(190,99,255,.35);
-      transition: transform .2s ease;
+      box-shadow: 0 0 22px rgba(190, 99, 255, 0.35);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
     }
 
-    .tarjetas > a.boton-buzon:hover {
+    .tarjetas > a.boton-buzon:hover,
+    .tarjetas > a.boton-afinacion:hover,
+    .tarjetas > a.boton-calendario:hover {
       transform: translateY(-3px);
+      box-shadow: 0 0 28px rgba(190, 99, 255, 0.55);
     }
 
-    .tarjetas > a.boton-buzon span {
+    .tarjetas > a.boton-buzon span,
+    .tarjetas > a.boton-afinacion span,
+    .tarjetas > a.boton-calendario span {
       font-size: 18px;
     }
 
-    /* NUEVO: Sala de Afinación */
-    .tarjetas > a.boton-afinacion {
-      display: flex;
+    /* =====================================
+       CALENDARIO EN EL MENÚ PRINCIPAL
+       ===================================== */
+
+    .menu > a.boton-calendario-menu {
+      display: inline-flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      min-height: 160px;
-      padding: 22px;
-      border: 3px solid #d99aff;
-      border-radius: 32px;
-      background: linear-gradient(
-        145deg,
-        #613078,
-        #42204f
-      );
-      color: #fff;
-      font: inherit;
-      font-size: 26px;
-      font-weight: 800;
+      gap: 4px;
+      padding: 10px;
+      border-radius: 12px;
+      color: inherit;
       text-decoration: none;
-      text-align: center;
-      box-shadow: 0 0 22px rgba(190,99,255,.35);
-      transition: transform .2s ease;
+      font: inherit;
+      cursor: pointer;
     }
 
-    .tarjetas > a.boton-afinacion:hover {
-      transform: translateY(-3px);
+    .menu > a.boton-calendario-menu small {
+      font-size: inherit;
     }
 
-    .tarjetas > a.boton-afinacion span {
-      font-size: 18px;
+    /* =====================================
+       CALENDARIO EN LA PRESENTACIÓN
+       ===================================== */
+
+    .acciones > a.boton-calendario-inicio {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border: 2px solid #d99aff;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #613078, #42204f);
+      color: #fff;
+      text-decoration: none;
+      font: inherit;
+      font-weight: bold;
+      cursor: pointer;
     }
 
-    .tarjetas > a.boton-afinacion:focus-visible {
+    .acciones > a.boton-calendario-inicio:hover {
+      filter: brightness(1.15);
+    }
+
+    /* =====================================
+       ACCESIBILIDAD
+       ===================================== */
+
+    a.boton-buzon:focus-visible,
+    a.boton-afinacion:focus-visible,
+    a.boton-calendario:focus-visible,
+    a.boton-calendario-menu:focus-visible,
+    a.boton-calendario-inicio:focus-visible {
       outline: 3px solid #f1d4ff;
       outline-offset: 4px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tarjetas > a.boton-buzon,
+      .tarjetas > a.boton-afinacion,
+      .tarjetas > a.boton-calendario {
+        transition: none;
+      }
     }
   </style>
 </head>
 
 <body>
+
+  <!-- =====================================
+       CABECERA PRINCIPAL
+       ===================================== -->
+
   <header class="cabecera">
+
     <div class="marca">
+
       <span class="luna">☾</span>
+
       <div>
         <h1>Casa-Lumi <span>✦</span></h1>
         <p>un pequeño mundo digital</p>
       </div>
+
     </div>
-    <button id="luz" class="luz" aria-label="Cambiar iluminación">☼</button>
+
+    <button
+      id="luz"
+      class="luz"
+      type="button"
+      aria-label="Cambiar iluminación"
+    >
+      ☼
+    </button>
+
   </header>
 
+  <!-- =====================================
+       NAVEGACIÓN PRINCIPAL
+       ===================================== -->
+
   <nav class="menu" aria-label="Navegación">
-    <button class="activo" data-seccion="inicio">⌂ <small>Inicio</small></button>
-    <button data-seccion="dormitorio">♧ <small>Dormitorio</small></button>
-    <button data-seccion="bano">♨ <small>Baño</small></button>
-    <button data-seccion="cocina">♨ <small>Cocina</small></button>
-    <button data-seccion="calendario">▦ <small>Calendario</small></button>
-    <button data-seccion="patio">✿ <small>Patio</small></button>
-    <button data-seccion="sala">▤ <small>Sala</small></button>
-    <button data-seccion="lavanderia">◈ <small>Lavandería</small></button>
-    <button data-seccion="musica">♫ <small>Música</small></button>
+
+    <button
+      class="activo"
+      type="button"
+      data-seccion="inicio"
+    >
+      ⌂ <small>Inicio</small>
+    </button>
+
+    <button type="button" data-seccion="dormitorio">
+      ♧ <small>Dormitorio</small>
+    </button>
+
+    <button type="button" data-seccion="bano">
+      ♨ <small>Baño</small>
+    </button>
+
+    <button type="button" data-seccion="cocina">
+      ♨ <small>Cocina</small>
+    </button>
+
+    <!-- CALENDARIO: ENLACE DIRECTO -->
+
+    <a
+      href="calendario/index.html"
+      class="boton-calendario-menu"
+    >
+      ▦ <small>Calendario</small>
+    </a>
+
+    <button type="button" data-seccion="patio">
+      ✿ <small>Patio</small>
+    </button>
+
+    <button type="button" data-seccion="sala">
+      ▤ <small>Sala</small>
+    </button>
+
+    <button type="button" data-seccion="lavanderia">
+      ◈ <small>Lavandería</small>
+    </button>
+
+    <button type="button" data-seccion="musica">
+      ♫ <small>Música</small>
+    </button>
+
   </nav>
 
   <main>
-    <section id="inicio" class="pantalla visible">
+
+    <!-- =====================================
+         PANTALLA DE INICIO
+         ===================================== -->
+
+    <section
+      id="inicio"
+      class="pantalla visible"
+    >
+
       <div class="hero">
+
+        <!-- PERSONAJE OFICIAL DE LUMI -->
+
         <div class="arte">
+
           <img
             src="assets/lumi-referencia.png"
             alt="Lumi junto a su gatito y Lulú"
             class="lumi"
             id="lumi"
           >
-          <span class="estrella e1">✦</span>
-          <span class="estrella e2">✧</span>
-          <span class="estrella e3">✦</span>
+
+          <span class="estrella e1" aria-hidden="true">✦</span>
+          <span class="estrella e2" aria-hidden="true">✧</span>
+          <span class="estrella e3" aria-hidden="true">✦</span>
+
         </div>
 
+        <!-- PRESENTACIÓN -->
+
         <div class="presentacion">
-          <p class="eyebrow">✦ BIENVENIDA A CASA ✦</p>
-          <h2>Hola, soy <em>Lumi.</em> ♡</h2>
+
+          <p class="eyebrow">
+            ✦ BIENVENIDA A CASA ✦
+          </p>
+
+          <h2>
+            Hola, soy <em>Lumi.</em> ♡
+          </h2>
+
           <p>
-            Este es mi pequeño hogar. Puedes acompañarme
-            mientras recorro mis habitaciones, cuido a Lulú
+            Este es mi pequeño hogar.
+            Puedes acompañarme mientras recorro
+            mis habitaciones, cuido a Lulú
             y organizo mis días.
           </p>
 
           <div class="acciones">
-            <button data-ir="sala">⌂ Conocer mi departamento</button>
-            <button data-ir="calendario">▦ Ver calendario</button>
+
+            <button
+              type="button"
+              data-ir="sala"
+            >
+              ⌂ Conocer mi departamento
+            </button>
+
+            <!-- ACCESO DIRECTO AL CALENDARIO -->
+
+            <a
+              href="calendario/index.html"
+              class="boton-calendario-inicio"
+            >
+              ▦ Ver calendario
+            </a>
+
           </div>
 
-          <p id="saludo" aria-live="polite" class="mensaje">
+          <p
+            id="saludo"
+            aria-live="polite"
+            class="mensaje"
+          >
             Tócame para saludar 💜
           </p>
+
         </div>
+
       </div>
 
+      <!-- =====================================
+           ACTIVIDADES DE CASA-LUMI
+           ===================================== -->
+
       <div class="actividades">
-        <p class="eyebrow">TU ESPACIO</p>
-        <h2>¿Qué hacemos hoy?</h2>
+
+        <p class="eyebrow">
+          TU ESPACIO
+        </p>
+
+        <h2>
+          ¿Qué hacemos hoy?
+        </h2>
 
         <div class="tarjetas">
-          <button data-ir="sala">
+
+          <!-- EXPLORAR EL HOGAR -->
+
+          <button
+            type="button"
+            data-ir="sala"
+          >
             ⌂ <span>Explorar el hogar</span>
           </button>
 
-          <a href="dressingroom/vestidor.html" class="boton-closet">
+          <!-- CLÓSET MÁGICO -->
+
+          <a
+            href="dressingroom/vestidor.html"
+            class="boton-closet"
+          >
             👗 Mi Clóset Mágico
           </a>
 
-          <button data-ir="patio">
+          <!-- PATIO DE LULÚ -->
+
+          <button
+            type="button"
+            data-ir="patio"
+          >
             ✿ <span>Cuidar a Lulú</span>
           </button>
 
-          <button data-ir="calendario">
-            ▦ <span>Organizar mis días</span>
-          </button>
+          <!-- CALENDARIO MÁGICO -->
 
-          <!-- BUZÓN DE MENSAJES -->
-          <a href="buzon/index.html" class="boton-buzon">
-            💌 <span>Buzón de Cony y Yarin</span>
+          <a
+            href="calendario/index.html"
+            class="boton-calendario"
+          >
+            📅
+            <span>Organizar mis días</span>
           </a>
 
-          <!-- NUEVO: SALA DE AFINACIÓN -->
-          <a href="afinacion/index.html" class="boton-afinacion">
-            🎸 <span>Sala de Afinación</span>
+          <!-- BUZÓN MÁGICO -->
+
+          <a
+            href="buzon/index.html"
+            class="boton-buzon"
+          >
+            💌
+            <span>Buzón de Cony y Yarin</span>
           </a>
+
+          <!-- SALA DE AFINACIÓN -->
+
+          <a
+            href="afinacion/index.html"
+            class="boton-afinacion"
+          >
+            🎸
+            <span>Sala de Afinación</span>
+          </a>
+
         </div>
+
       </div>
+
     </section>
 
-    <section id="habitacion" class="pantalla habitacion">
+    <!-- =====================================
+         HABITACIONES DE CASA-LUMI
+         ===================================== -->
+
+    <section
+      id="habitacion"
+      class="pantalla habitacion"
+    >
+
       <div class="habitacion-panel">
-        <p class="eyebrow">CASA-LUMI 2D</p>
-        <h2 id="titulo-habitacion"></h2>
-        <p id="detalle-habitacion"></p>
-        <p class="aviso">
-          Esta habitación se construirá en la siguiente fase.
-          La portada y su navegación ya funcionan.
+
+        <p class="eyebrow">
+          CASA-LUMI 2D
         </p>
-        <button data-ir="inicio">☾ Volver al inicio</button>
+
+        <h2 id="titulo-habitacion"></h2>
+
+        <p id="detalle-habitacion"></p>
+
+        <p class="aviso">
+          Esta habitación se construirá
+          en la siguiente fase.
+          La portada y su navegación
+          ya funcionan.
+        </p>
+
+        <button
+          type="button"
+          data-ir="inicio"
+        >
+          ☾ Volver al inicio
+        </button>
+
       </div>
+
     </section>
+
   </main>
+
 </body>
 </html>
