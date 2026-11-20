@@ -1,0 +1,485 @@
+
+<!-- =====================================
+ CASA-LUMI 💜
+ MEJORAS DEL CALENDARIO MÁGICO
+ BÚSQUEDA, COPIAS Y RECORDATORIOS
+===================================== -->
+
+<style>
+.herramientas-lumi {
+ background:#29183d;
+ border:2px solid #8154a6;
+ border-radius:22px;
+ padding:16px;
+ margin:18px 0;
+ box-shadow:0 0 20px #a865ee25;
+}
+
+.herramientas-lumi h2 {
+ text-align:center;
+ color:#e5bdff;
+}
+
+.botones-lumi {
+ display:flex;
+ gap:10px;
+ flex-wrap:wrap;
+ margin-top:12px;
+}
+
+.botones-lumi button {
+ flex:1;
+ min-width:140px;
+}
+
+.resultado-lumi {
+ padding:12px;
+ margin:10px 0;
+ border-left:3px solid #cf9eff;
+ background:#3c2454;
+ border-radius:10px;
+ overflow-wrap:anywhere;
+}
+
+.resultado-lumi strong {
+ color:#f3d8ff;
+}
+
+.resultado-lumi p {
+ white-space:pre-wrap;
+}
+
+.marca-recordatorio {
+ display:block;
+ color:#ffe09b;
+ font-size:13px;
+ margin-top:3px;
+}
+
+#estadoHerramientas {
+ color:#d7f6df;
+ font-size:14px;
+}
+</style>
+
+<script>
+"use strict";
+
+/* =====================================
+   NUEVAS HERRAMIENTAS CASA-LUMI
+===================================== */
+
+(function(){
+
+ const panel = document.createElement("section");
+ panel.className = "herramientas-lumi";
+
+ panel.innerHTML = `
+  <h2>🔎 Buscar eventos</h2>
+
+  <label for="buscarEventoLumi">
+   Busca por nombre o descripción
+  </label>
+
+  <input
+   id="buscarEventoLumi"
+   type="search"
+   placeholder="Ej. Cumpleaños, reunión..."
+   autocomplete="off"
+  >
+
+  <div id="resultadosBusquedaLumi"></div>
+
+  <h2>📦 Copias de seguridad</h2>
+
+  <p class="aviso">
+   Exporta tus eventos para conservar
+   una copia en tu dispositivo.
+  </p>
+
+  <div class="botones-lumi">
+   <button id="exportarLumi" type="button">
+    📥 Exportar eventos
+   </button>
+
+   <button id="importarLumi" type="button">
+    📤 Importar eventos
+   </button>
+  </div>
+
+  <input
+   id="archivoLumi"
+   type="file"
+   accept=".json,application/json"
+   style="display:none"
+  >
+
+  <p id="estadoHerramientas" role="status"></p>
+ `;
+
+ const formulario = document.querySelector(
+  "#formulario"
+ );
+
+ const seccion = formulario.closest("section");
+
+ seccion.parentNode.insertBefore(
+  panel,
+  seccion
+ );
+
+ const buscar = document.getElementById(
+  "buscarEventoLumi"
+ );
+
+ const resultados = document.getElementById(
+  "resultadosBusquedaLumi"
+ );
+
+ const estado = document.getElementById(
+  "estadoHerramientas"
+ );
+
+ const archivo = document.getElementById(
+  "archivoLumi"
+ );
+
+ /* =====================================
+    BUSCADOR DE EVENTOS
+ ===================================== */
+
+ function buscarEventos(){
+
+  const texto = buscar.value
+   .trim()
+   .toLocaleLowerCase("es");
+
+  resultados.replaceChildren();
+
+  if(!texto){
+   return;
+  }
+
+  const encontrados = eventos.filter(e=>{
+
+   const titulo = String(
+    e.titulo || ""
+   ).toLocaleLowerCase("es");
+
+   const descripcion = String(
+    e.descripcion || ""
+   ).toLocaleLowerCase("es");
+
+   return titulo.includes(texto) ||
+          descripcion.includes(texto);
+
+  }).sort((a,b)=>
+   a.fecha.localeCompare(b.fecha)
+  );
+
+  if(!encontrados.length){
+   resultados.textContent =
+    "No se encontraron eventos 💜";
+   return;
+  }
+
+  encontrados.forEach(e=>{
+
+   const div = document.createElement("div");
+   div.className = "resultado-lumi";
+
+   const titulo = document.createElement("strong");
+
+   titulo.textContent =
+    "💜 " + e.titulo;
+
+   const fecha = document.createElement("p");
+
+   fecha.textContent =
+    "📅 " + e.fecha +
+    (e.hora ? " · 🕒 " + e.hora : "");
+
+   div.append(titulo,fecha);
+
+   if(e.descripcion){
+    const descripcion = document.createElement("p");
+    descripcion.textContent = e.descripcion;
+    div.appendChild(descripcion);
+   }
+
+   const boton = document.createElement("button");
+   boton.type = "button";
+   boton.textContent = "📅 Ver evento";
+
+   boton.addEventListener("click",()=>{
+
+    elegida = e.fecha;
+
+    const partes = e.fecha
+     .split("-")
+     .map(Number);
+
+    vista = new Date(
+     partes[0],
+     partes[1]-1,
+     1
+    );
+
+    document.getElementById("fecha").value =
+     elegida;
+
+    render();
+
+    document.getElementById("dias")
+     .scrollIntoView({
+      behavior:"smooth",
+      block:"center"
+     });
+
+   });
+
+   div.appendChild(boton);
+   resultados.appendChild(div);
+
+  });
+
+ }
+
+ buscar.addEventListener(
+  "input",
+  buscarEventos
+ );
+
+ /* =====================================
+    EXPORTAR EVENTOS JSON
+ ===================================== */
+
+ document.getElementById("exportarLumi")
+ .addEventListener("click",()=>{
+
+  const contenido = JSON.stringify(
+   {
+    aplicacion:"Casa-Lumi",
+    version:1,
+    fechaExportacion:new Date().toISOString(),
+    eventos:eventos
+   },
+   null,
+   2
+  );
+
+  const blob = new Blob(
+   [contenido],
+   {type:"application/json"}
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const enlace = document.createElement("a");
+
+  enlace.href = url;
+
+  enlace.download =
+   "Casa-Lumi-Eventos-" +
+   fechaLocal(new Date()) +
+   ".json";
+
+  document.body.appendChild(enlace);
+
+  enlace.click();
+  enlace.remove();
+
+  setTimeout(()=>{
+   URL.revokeObjectURL(url);
+  },1000);
+
+  estado.textContent =
+   "💜 Copia preparada para descargar.";
+
+ });
+
+ /* =====================================
+    IMPORTAR EVENTOS JSON
+ ===================================== */
+
+ document.getElementById("importarLumi")
+ .addEventListener("click",()=>{
+
+  archivo.click();
+
+ });
+
+ archivo.addEventListener(
+  "change",
+  async ()=>{
+
+   const seleccionado = archivo.files[0];
+
+   if(!seleccionado){
+    return;
+   }
+
+   try{
+
+    if(seleccionado.size > 5*1024*1024){
+     throw new Error(
+      "El archivo es demasiado grande."
+     );
+    }
+
+    const contenido = await seleccionado.text();
+
+    const datos = JSON.parse(contenido);
+
+    if(
+     !datos ||
+     datos.aplicacion !== "Casa-Lumi" ||
+     !Array.isArray(datos.eventos)
+    ){
+     throw new Error(
+      "Este archivo no es una copia válida de Casa-Lumi."
+     );
+    }
+
+    const validos = datos.eventos.every(e=>
+     e &&
+     typeof e.id === "string" &&
+     typeof e.titulo === "string" &&
+     typeof e.fecha === "string" &&
+     fechaValida(e.fecha) &&
+     e.titulo.trim().length > 0 &&
+     e.titulo.length <= 100 &&
+     (e.descripcion === undefined ||
+      (typeof e.descripcion === "string" &&
+       e.descripcion.length <= 1000)) &&
+     (e.hora === undefined ||
+      e.hora === "" ||
+      (typeof e.hora === "string" &&
+       /^([01]\d|2[0-3]):[0-5]\d$/.test(e.hora))) &&
+     (e.recordatorio === undefined ||
+      [0,10,60,1440].includes(
+       Number(e.recordatorio)
+      ))
+    );
+
+    if(!validos){
+     throw new Error(
+      "Algunos eventos tienen datos inválidos."
+     );
+    }
+
+    const confirmar = confirm(
+     "¿Importar estos eventos? " +
+     "Se conservarán los existentes y " +
+     "se actualizarán los que tengan el mismo ID."
+    );
+
+    if(!confirmar){
+     return;
+    }
+
+    const anteriores = eventos.slice();
+
+    const mapa = new Map(
+     eventos.map(e=>[e.id,e])
+    );
+
+    datos.eventos.forEach(e=>{
+
+     mapa.set(e.id,{
+      id:e.id,
+      titulo:e.titulo,
+      fecha:e.fecha,
+      hora:e.hora || "",
+      descripcion:e.descripcion || "",
+      recordatorio:Number(e.recordatorio || 0)
+     });
+
+    });
+
+    eventos = Array.from(mapa.values());
+
+    if(!guardarDatos()){
+     eventos = anteriores;
+     throw new Error(
+      "No se pudieron guardar los eventos importados."
+     );
+    }
+
+    render();
+    buscarEventos();
+
+    estado.textContent =
+     "💜 Eventos importados correctamente.";
+
+   }catch(error){
+
+    estado.textContent =
+     "⚠️ " + error.message;
+
+   }finally{
+
+    archivo.value = "";
+
+   }
+
+  }
+ );
+
+ /* =====================================
+    CAMPANITAS EN EL CALENDARIO
+ ===================================== */
+
+ const renderOriginal = render;
+
+ render = function(){
+
+  renderOriginal();
+
+  const botones = document.querySelectorAll(
+   "#dias button.dia"
+  );
+
+  botones.forEach(boton=>{
+
+   const etiqueta = boton.getAttribute(
+    "aria-label"
+   ) || "";
+
+   const fecha = etiqueta.replace(
+    "Seleccionar ",
+    ""
+   );
+
+   const tieneRecordatorio = eventos.some(e=>
+    e.fecha === fecha &&
+    Number(e.recordatorio) > 0 &&
+    Boolean(e.hora)
+   );
+
+   if(tieneRecordatorio){
+
+    const marca = document.createElement("span");
+
+    marca.className = "marca-recordatorio";
+    marca.textContent = "🔔";
+
+    marca.setAttribute(
+     "aria-label",
+     "Tiene recordatorio"
+    );
+
+    boton.appendChild(marca);
+
+   }
+
+  });
+
+  buscarEventos();
+
+ };
+
+ render();
+
+})();
+</script>
