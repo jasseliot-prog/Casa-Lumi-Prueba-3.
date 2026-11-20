@@ -39,6 +39,45 @@
     .tarjetas > a.boton-buzon span {
       font-size: 18px;
     }
+
+    /* NUEVO: Sala de Afinación */
+    .tarjetas > a.boton-afinacion {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      min-height: 160px;
+      padding: 22px;
+      border: 3px solid #d99aff;
+      border-radius: 32px;
+      background: linear-gradient(
+        145deg,
+        #613078,
+        #42204f
+      );
+      color: #fff;
+      font: inherit;
+      font-size: 26px;
+      font-weight: 800;
+      text-decoration: none;
+      text-align: center;
+      box-shadow: 0 0 22px rgba(190,99,255,.35);
+      transition: transform .2s ease;
+    }
+
+    .tarjetas > a.boton-afinacion:hover {
+      transform: translateY(-3px);
+    }
+
+    .tarjetas > a.boton-afinacion span {
+      font-size: 18px;
+    }
+
+    .tarjetas > a.boton-afinacion:focus-visible {
+      outline: 3px solid #f1d4ff;
+      outline-offset: 4px;
+    }
   </style>
 </head>
 
@@ -122,9 +161,14 @@
             ▦ <span>Organizar mis días</span>
           </button>
 
-          <!-- NUEVO: BUZÓN DE MENSAJES -->
+          <!-- BUZÓN DE MENSAJES -->
           <a href="buzon/index.html" class="boton-buzon">
             💌 <span>Buzón de Cony y Yarin</span>
+          </a>
+
+          <!-- NUEVO: SALA DE AFINACIÓN -->
+          <a href="afinacion/index.html" class="boton-afinacion">
+            🎸 <span>Sala de Afinación</span>
           </a>
         </div>
       </div>
