@@ -730,6 +730,138 @@ $("archivo").addEventListener("change",async()=>{
  }
 });
 
+
 function abrirGoogle(e){
  if(!e.hora){
-  alert("Indica una hora para enviarlo al cale
+  alert("Indica una hora para enviarlo al calendario del móvil.");
+  return;
+ }
+
+ const [y,m,d]=e.fecha.split("-").map(Number);
+ const [h,min]=e.hora.split(":").map(Number);
+
+ const inicio=new Date(y,m-1,d,h,min);
+ const fin=new Date(inicio.getTime()+3600000);
+
+ const formato=fecha=>
+  fecha.getFullYear()+
+  String(fecha.getMonth()+1).padStart(2,"0")+
+  String(fecha.getDate()).padStart(2,"0")+"T"+
+  String(fecha.getHours()).padStart(2,"0")+
+  String(fecha.getMinutes()).padStart(2,"0")+"00";
+
+ const params=new URLSearchParams({
+  action:"TEMPLATE",
+  text:e.titulo,
+  dates:formato(inicio)+"/"+formato(fin),
+  details:e.descripcion||"Evento de Casa-Lumi 💜",
+  ctz:"America/Santiago"
+ });
+
+ const url="https://calendar.google.com/calendar/render?"+
+  params.toString();
+
+ const ventana=window.open(url,"_blank");
+
+ if(!ventana){
+  window.location.href=url;
+ }
+}
+
+function escaparICS(s){
+ return String(s||"")
+  .replace(/\\/g,"\\\\")
+  .replace(/\r?\n/g,"\\n")
+  .replace(/,/g,"\\,")
+  .replace(/;/g,"\\;");
+}
+
+function fechaICS(d){
+ return d.getFullYear()+
+  String(d.getMonth()+1).padStart(2,"0")+
+  String(d.getDate()).padStart(2,"0");
+}
+
+function fechaHoraICS(d){
+ return fechaICS(d)+"T"+
+  String(d.getHours()).padStart(2,"0")+
+  String(d.getMinutes()).padStart(2,"0")+"00";
+}
+
+function descargarICS(e){
+ const [y,m,d]=e.fecha.split("-").map(Number);
+ const fecha=new Date(y,m-1,d);
+ const ahora=new Date();
+
+ let inicio,fin;
+
+ if(e.hora){
+  const [h,min]=e.hora.split(":").map(Number);
+
+  const empieza=new Date(y,m-1,d,h,min);
+  const termina=new Date(empieza.getTime()+3600000);
+
+  inicio="DTSTART:"+fechaHoraICS(empieza);
+  fin="DTEND:"+fechaHoraICS(termina);
+ }else{
+  const siguiente=new Date(y,m-1,d+1);
+
+  inicio="DTSTART;VALUE=DATE:"+fechaICS(fecha);
+  fin="DTEND;VALUE=DATE:"+fechaICS(siguiente);
+ }
+
+ const uid=String(e.id)
+  .replace(/[^a-zA-Z0-9-]/g,"")+"@casa-lumi";
+
+ const sello=
+  ahora.getUTCFullYear()+
+  String(ahora.getUTCMonth()+1).padStart(2,"0")+
+  String(ahora.getUTCDate()).padStart(2,"0")+"T"+
+  String(ahora.getUTCHours()).padStart(2,"0")+
+  String(ahora.getUTCMinutes()).padStart(2,"0")+
+  String(ahora.getUTCSeconds()).padStart(2,"0")+"Z";
+
+ const lineas=[
+  "BEGIN:VCALENDAR",
+  "VERSION:2.0",
+  "PRODID:-//Casa-Lumi//Calendario Magico//ES",
+  "CALSCALE:GREGORIAN",
+  "BEGIN:VEVENT",
+  "UID:"+uid,
+  "DTSTAMP:"+sello,
+  inicio,
+  fin,
+  "SUMMARY:"+escaparICS(e.titulo),
+  "DESCRIPTION:"+escaparICS(e.descripcion)
+ ];
+
+ if(e.recordatorio&&e.hora){
+  lineas.push(
+   "BEGIN:VALARM",
+   "TRIGGER:-PT"+e.recordatorio+"M",
+   "ACTION:DISPLAY",
+   "DESCRIPTION:"+escaparICS(e.titulo),
+   "END:VALARM"
+  );
+ }
+
+ lineas.push(
+  "END:VEVENT",
+  "END:VCALENDAR"
+ );
+
+ descargar(
+  lineas.join("\r\n")+"\r\n",
+  "text/calendar;charset=utf-8",
+  "Casa-Lumi-"+e.fecha+".ics"
+ );
+}
+
+$("fecha").value=elegida;
+render();
+setInterval(renderPendientes,60000);
+
+</script>
+</body>
+</html>
+
