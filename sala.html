@@ -5,31 +5,54 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#160b25">
+
 <title>Mi Sala de Estar | Casa-Lumi</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+ box-sizing:border-box;
+}
+
 body{
  margin:0;
  min-height:100vh;
- background:radial-gradient(circle at top,#48245f,#160b25 80%);
+ background:radial-gradient(
+  circle at top,
+  #48245f,
+  #160b25 80%
+ );
  color:#fff0ff;
  font-family:Arial,sans-serif;
 }
+
 main{
  max-width:680px;
  margin:auto;
  padding:18px 12px 45px;
 }
+
 .volver{
  display:inline-block;
  color:#eac7ff;
  text-decoration:none;
  margin-bottom:18px;
 }
-h1,h2,.subtitulo{text-align:center}
-h1{color:#f1caff;margin-bottom:8px}
-.subtitulo{color:#e2b5ff;margin-bottom:24px}
+
+h1,h2,.subtitulo{
+ text-align:center;
+}
+
+h1{
+ color:#f1caff;
+ margin-bottom:8px;
+}
+
+.subtitulo{
+ color:#e2b5ff;
+ margin-bottom:24px;
+ line-height:1.6;
+}
+
 .casilla{
  background:#29163d;
  border:3px solid #c77cff;
@@ -38,25 +61,36 @@ h1{color:#f1caff;margin-bottom:8px}
  margin-bottom:20px;
  box-shadow:0 0 18px #b76cff55;
 }
-.casilla h2{font-size:20px;color:#f1caff}
+
+.casilla h2{
+ font-size:20px;
+ color:#f1caff;
+}
+
 .casilla img{
  display:block;
  width:100%;
  height:auto;
  border-radius:14px;
 }
-.oculto{display:none!important}
+
+.oculto{
+ display:none!important;
+}
+
 .aviso{
  text-align:center;
  line-height:1.6;
  padding:20px;
  color:#ead0ff;
 }
+
 #mensaje{
  text-align:center;
  line-height:1.6;
  color:#ead0ff;
 }
+
 button{
  display:block;
  margin:20px auto;
@@ -68,35 +102,189 @@ button{
  font-size:16px;
  cursor:pointer;
 }
-button:disabled{opacity:.5;cursor:not-allowed}
+
+button:disabled{
+ opacity:.5;
+ cursor:not-allowed;
+}
+
+/* TERCER CUADRO */
+
+.estado-contenido{
+ padding:12px;
+ border-radius:18px;
+ background:linear-gradient(
+  135deg,
+  #38204f,
+  #20112f
+ );
+}
+
+.estado-datos{
+ display:grid;
+ gap:12px;
+}
+
+.estado-linea{
+ background:#4a2865;
+ border:1px solid #a96de0;
+ border-radius:14px;
+ padding:13px;
+ line-height:1.6;
+}
+
+.estado-linea strong{
+ color:#f2c8ff;
+}
+
+.estado-mensaje{
+ margin-top:16px;
+ padding:16px;
+ text-align:center;
+ line-height:1.7;
+ background:#62387b;
+ border:2px solid #d49aff;
+ border-radius:20px;
+ color:white;
+}
+
+.estado-decoracion{
+ text-align:center;
+ color:#d9aaff;
+ padding:12px;
+}
+
+.estado-retrato{
+ margin-bottom:14px;
+}
+
+.estado-retrato img{
+ max-width:100%;
+}
+
+.estado-retrato .aviso{
+ padding:12px;
+}
+
+@media(min-width:480px){
+ .estado-datos{
+  grid-template-columns:1fr;
+ }
+}
 </style>
 </head>
 
 <body>
+
 <main>
+
 <a class="volver" href="index.html">
 ← Volver a Casa-Lumi
 </a>
 
 <h1>💜 Mi Sala de Estar 💜</h1>
-<p class="subtitulo" id="temporada">Preparando mi sala...</p>
+
+<p class="subtitulo" id="temporada">
+Preparando mi sala...
+</p>
+
+<!-- CUADRO 1 -->
 
 <section class="casilla">
+
 <h2>🏡 Mi ambiente</h2>
-<img id="ambiente" class="oculto" alt="Sala de estar">
-<p class="aviso oculto" id="aviso-ambiente"></p>
+
+<img
+ id="ambiente"
+ class="oculto"
+ alt="Sala de estar"
+>
+
+<p
+ class="aviso oculto"
+ id="aviso-ambiente">
+</p>
+
 </section>
 
+<!-- CUADRO 2 -->
+
 <section class="casilla">
+
 <h2>✨ ¿Qué estoy haciendo?</h2>
-<img id="actividad" class="oculto" alt="Actividad de Lumi">
-<p class="aviso oculto" id="aviso-actividad"></p>
+
+<img
+ id="actividad"
+ class="oculto"
+ alt="Actividad de Lumi"
+>
+
+<p
+ class="aviso oculto"
+ id="aviso-actividad">
+</p>
+
 </section>
 
+<!-- CUADRO 3 -->
+
 <section class="casilla">
+
 <h2>♡ Mi estado actual ♡</h2>
-<img id="estado" class="oculto" alt="Estado de Lumi">
-<p class="aviso oculto" id="aviso-estado"></p>
+
+<div class="estado-contenido">
+
+<div class="estado-retrato">
+
+<img
+ id="estado"
+ class="oculto"
+ alt="Estado actual de Lumi"
+>
+
+<p
+ class="aviso oculto"
+ id="aviso-estado">
+</p>
+
+</div>
+
+<div class="estado-datos">
+
+<div class="estado-linea">
+<strong>🌸 Vestuario:</strong>
+<span id="vestuario-actual">
+Preparando ropa...
+</span>
+</div>
+
+<div class="estado-linea">
+<strong>😊 Emoción:</strong>
+<span id="emocion-actual">
+Tranquila
+</span>
+</div>
+
+<div class="estado-linea">
+<strong>✨ Actividad:</strong>
+<span id="actividad-actual">
+Preparando actividad...
+</span>
+</div>
+
+</div>
+
+<div class="estado-mensaje"
+ id="mensaje-estado">
+ 💜 Bienvenida a mi sala.
+</div>
+
+<div class="estado-decoracion">
+ ✨ 🌸 💜 🌙 ✨
+</div>
+
+</div>
+
 </section>
 
 <p id="mensaje" aria-live="polite"></p>
@@ -104,14 +292,91 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <button id="otra-actividad" type="button">
 ✨ Otra actividad
 </button>
+
 </main>
 
 <script>
 "use strict";
 
-/* CASA-LUMI - SALA DE ESTAR */
+/* =====================================
+   CASA-LUMI
+   SALA DE ESTAR AUTOMÁTICA
+   ===================================== */
 
 const BASE="assets/";
+
+/* =====================================
+   HORARIOS
+   ===================================== */
+
+const HORARIOS={
+ dia:{
+  inicio:6,
+  fin:12,
+  nombre:"☀️ De día"
+ },
+ tarde:{
+  inicio:12,
+  fin:20,
+  nombre:"🌅 De tarde"
+ },
+ noche:{
+  inicio:20,
+  fin:6,
+  nombre:"🌙 De noche"
+ }
+};
+
+/* =====================================
+   LOS 10 VESTUARIOS OFICIALES
+   ===================================== */
+
+const VESTUARIOS={
+ primavera:{
+  nombre:"Primavera",
+  icono:"🌸"
+ },
+ verano:{
+  nombre:"Verano",
+  icono:"☀️"
+ },
+ otono:{
+  nombre:"Otoño",
+  icono:"🍂"
+ },
+ invierno:{
+  nombre:"Invierno",
+  icono:"❄️"
+ },
+ navidad:{
+  nombre:"Navidad",
+  icono:"🎄"
+ },
+ anoNuevo:{
+  nombre:"Año Nuevo",
+  icono:"🎆"
+ },
+ sanValentin:{
+  nombre:"San Valentín",
+  icono:"💕"
+ },
+ fiestasPatrias:{
+  nombre:"Fiestas Patrias",
+  icono:"🇨🇱"
+ },
+ pijamaVerano:{
+  nombre:"Pijama de verano",
+  icono:"🌙"
+ },
+ pijamaInvierno:{
+  nombre:"Pijama de invierno",
+  icono:"🌙"
+ }
+};
+
+/* =====================================
+   AMBIENTES
+   ===================================== */
 
 const AMBIENTES={
  dia:"sala-dia-sofa.png",
@@ -119,73 +384,91 @@ const AMBIENTES={
  noche:"sala-noche-sofa.png"
 };
 
+/* =====================================
+   ACTIVIDADES POR HORARIO
+   ===================================== */
+
 const ACTIVIDADES={
+
  dia:[
   {
+   id:"leyendo",
    nombre:"Leyendo un libro",
    emocion:"Tranquila",
    mensaje:"¡Qué linda mañana para leer! 💜",
    imagen:"sala-dia-lectura.png"
   },
   {
+   id:"notebook",
    nombre:"Usando mi notebook",
    emocion:"Concentrada",
    mensaje:"Estoy organizando mis ideas ✨",
    imagen:"sala-dia-escritorio.png"
   },
   {
+   id:"descansando",
    nombre:"Descansando en el sillón",
    emocion:"Relajada",
    mensaje:"Disfrutando un ratito de calma 💜",
    imagen:"sala-dia-sofa.png"
   }
  ],
+
  tarde:[
   {
+   id:"leyendo",
    nombre:"Leyendo un libro",
    emocion:"Tranquila",
    mensaje:"Una tarde perfecta para leer 📖",
-   imagen:null
+   imagen:"sala-tarde-leyendo.png"
   },
   {
+   id:"once",
    nombre:"Tomando once",
    emocion:"Contenta",
    mensaje:"¡Llegó la hora de la once! ☕",
-   imagen:null
+   imagen:"sala-tarde-taza.png"
   },
   {
+   id:"tejiendo",
+   nombre:"Tejiendo",
+   emocion:"Concentrada",
+   mensaje:"Estoy tejiendo algo bonito 🧶",
+   imagen:"sala-tarde-tejiendo.png"
+  },
+  {
+   id:"notebook",
+   nombre:"Usando mi notebook",
+   emocion:"Feliz y concentrada",
+   mensaje:"Estoy trabajando en mi notebook 💻",
+   imagen:"sala-tarde-notebook.png"
+  },
+  {
+   id:"pelicula",
    nombre:"Viendo una película",
    emocion:"Feliz",
-   mensaje:"Una película para disfrutar la tarde 💜",
-   imagen:null
-  },
-  {
-   nombre:"Usando mi notebook",
-   emocion:"Concentrada",
-   mensaje:"Tengo algunas ideas nuevas ✨",
-   imagen:null
-  },
-  {
-   nombre:"Escuchando música",
-   emocion:"Alegre",
-   mensaje:"Un poquito de música para mi tarde 🎵",
-   imagen:null
+   mensaje:"Disfrutando una película 🍿",
+   imagen:"sala-tarde-pelicula.png"
   }
  ],
+
  noche:[
   {
+   id:"descansando",
    nombre:"Descansando en el sillón",
    emocion:"Relajada",
    mensaje:"Qué agradable está la noche 🌙",
    imagen:"sala-noche-sofa.png"
   },
   {
+   id:"leyendo",
    nombre:"Leyendo un libro",
    emocion:"Tranquila",
    mensaje:"Un capítulo más antes de descansar 📖",
    imagen:"sala-noche-lectura.png"
   },
   {
+   id:"pelicula",
    nombre:"Viendo una película",
    emocion:"Contenta",
    mensaje:"Una película para terminar el día 💜",
@@ -194,78 +477,316 @@ const ACTIVIDADES={
  ]
 };
 
+/* =====================================
+   IMÁGENES DE OTROS VESTUARIOS
+
+   Cuando se suban, registrar aquí
+   sus nombres exactos.
+
+   No se utilizará una imagen con
+   ropa incorrecta.
+   ===================================== */
+
+const IMAGENES_VESTUARIO={
+ primavera:{
+  tarde:{
+   leyendo:"sala-tarde-leyendo.png",
+   once:"sala-tarde-taza.png",
+   tejiendo:"sala-tarde-tejiendo.png",
+   notebook:"sala-tarde-notebook.png",
+   pelicula:"sala-tarde-pelicula.png"
+  }
+ },
+
+ verano:{},
+ otono:{},
+ invierno:{},
+ navidad:{},
+ anoNuevo:{},
+ sanValentin:{},
+ fiestasPatrias:{},
+ pijamaVerano:{},
+ pijamaInvierno:{}
+};
+
+/* =====================================
+   ESTADO INTERNO
+   ===================================== */
+
 let escenaActual=null;
 let periodoActual="";
 let temporadaActual="";
+let vestuarioActual="";
+
+let ultimoCambio=Date.now();
+
+const MINUTOS_CAMBIO=15;
+
+/* =====================================
+   DETECTAR TEMPORADA EN CHILE
+   ===================================== */
 
 function obtenerTemporada(fecha){
+
  const mes=fecha.getMonth()+1;
- if(mes===9)return "fiestasPatrias";
- if(mes===12||mes<=2)return "verano";
- if(mes>=3&&mes<=5)return "otono";
- if(mes>=6&&mes<=8)return "invierno";
+
+ if(mes===12||mes<=2){
+  return "verano";
+ }
+
+ if(mes>=3&&mes<=5){
+  return "otono";
+ }
+
+ if(mes>=6&&mes<=8){
+  return "invierno";
+ }
+
  return "primavera";
 }
 
+/* =====================================
+   DETECTAR HORARIO
+   ===================================== */
+
 function obtenerPeriodo(fecha){
+
  const hora=fecha.getHours();
- if(hora>=6&&hora<12)return "dia";
- if(hora>=12&&hora<20)return "tarde";
+
+ if(hora>=6&&hora<12){
+  return "dia";
+ }
+
+ if(hora>=12&&hora<20){
+  return "tarde";
+ }
+
  return "noche";
 }
 
+/* =====================================
+   SELECCIÓN AUTOMÁTICA DE ROPA
+   ===================================== */
+
+function obtenerVestuario(fecha){
+
+ const dia=fecha.getDate();
+ const mes=fecha.getMonth()+1;
+
+ const temporada=obtenerTemporada(fecha);
+ const periodo=obtenerPeriodo(fecha);
+
+ // Celebraciones especiales
+
+ if(mes===12&&dia===25){
+  return "navidad";
+ }
+
+ if(
+  (mes===12&&dia===31)||
+  (mes===1&&dia===1)
+ ){
+  return "anoNuevo";
+ }
+
+ if(mes===2&&dia===14){
+  return "sanValentin";
+ }
+
+ if(mes===9&&dia>=18&&dia<=19){
+  return "fiestasPatrias";
+ }
+
+ // Pijamas nocturnos
+
+ if(periodo==="noche"){
+
+  if(
+   temporada==="verano"||
+   temporada==="primavera"
+  ){
+   return "pijamaVerano";
+  }
+
+  return "pijamaInvierno";
+ }
+
+ // Ropa por estación
+
+ return temporada;
+}
+
+/* =====================================
+   MOSTRAR IMÁGENES
+   ===================================== */
+
 function mostrarImagen(id,archivo,avisoTexto){
+
  const imagen=document.getElementById(id);
- const aviso=document.getElementById("aviso-"+id);
+ const aviso=document.getElementById(
+  "aviso-"+id
+ );
 
  imagen.onload=null;
  imagen.onerror=null;
+
  imagen.classList.add("oculto");
 
  if(!archivo){
+
   imagen.removeAttribute("src");
+
   aviso.textContent=avisoTexto;
   aviso.classList.remove("oculto");
+
   return;
  }
 
  aviso.classList.add("oculto");
 
  imagen.onload=()=>{
+
   imagen.classList.remove("oculto");
   aviso.classList.add("oculto");
+
  };
 
  imagen.onerror=()=>{
+
   imagen.classList.add("oculto");
-  aviso.textContent=avisoTexto;
+
+  aviso.textContent=
+   "Imagen pendiente: "+archivo;
+
   aviso.classList.remove("oculto");
+
  };
 
  imagen.src=BASE+archivo;
 }
 
-function actualizarTitulo(){
- const temporadas={
-  fiestasPatrias:"🇨🇱 Fiestas Patrias",
-  verano:"☀️ Verano",
-  otono:"🍂 Otoño",
-  invierno:"❄️ Invierno",
-  primavera:"🌸 Primavera"
- };
+/* =====================================
+   BUSCAR IMAGEN CORRECTA
+   ===================================== */
 
- const periodos={
-  dia:"☀️ De día",
-  tarde:"🌅 De tarde",
-  noche:"🌙 De noche"
- };
+function obtenerImagenActividad(){
 
- document.getElementById("temporada").textContent=
- temporadas[temporadaActual]+" · "+periodos[periodoActual];
+ if(!escenaActual){
+  return null;
+ }
+
+ const ropa=IMAGENES_VESTUARIO[
+  vestuarioActual
+ ];
+
+ if(
+  ropa&&
+  ropa[periodoActual]&&
+  ropa[periodoActual][escenaActual.id]
+ ){
+  return ropa[periodoActual][
+   escenaActual.id
+  ];
+ }
+
+ // Las imágenes originales del
+ // horario de día están registradas,
+ // pero todavía no se ha confirmado
+ // qué vestuario llevan.
+ //
+ // Por eso no se muestran con
+ // un conjunto distinto.
+
+ return null;
 }
 
+/* =====================================
+   ACTUALIZAR TÍTULO
+   ===================================== */
+
+function actualizarTitulo(){
+
+ const temporada=VESTUARIOS[
+  temporadaActual
+ ];
+
+ const horario=HORARIOS[
+  periodoActual
+ ];
+
+ const ropa=VESTUARIOS[
+  vestuarioActual
+ ];
+
+ document.getElementById(
+  "temporada"
+ ).textContent=
+  temporada.icono+" "+
+  temporada.nombre+
+  " · "+
+  horario.nombre+
+  " · "+
+  ropa.icono+" "+
+  ropa.nombre;
+}
+
+/* =====================================
+   MOSTRAR TERCER CUADRO
+   ===================================== */
+
+function mostrarEstado(){
+
+ if(!escenaActual){
+  return;
+ }
+
+ const ropa=VESTUARIOS[
+  vestuarioActual
+ ];
+
+ document.getElementById(
+  "vestuario-actual"
+ ).textContent=
+  ropa.icono+" "+ropa.nombre;
+
+ document.getElementById(
+  "emocion-actual"
+ ).textContent=
+  escenaActual.emocion;
+
+ document.getElementById(
+  "actividad-actual"
+ ).textContent=
+  escenaActual.nombre;
+
+ document.getElementById(
+  "mensaje-estado"
+ ).textContent=
+  "💜 "+escenaActual.mensaje;
+
+ // Imagen específica del estado:
+ // pendiente de registrar.
+ // Mientras tanto se mantienen
+ // todos los datos visibles.
+
+ mostrarImagen(
+  "estado",
+  null,
+  "💜 Lumi está "+
+  escenaActual.nombre.toLowerCase()+
+  "."
+ );
+}
+
+/* =====================================
+   MOSTRAR ESCENA COMPLETA
+   ===================================== */
+
 function mostrarEscena(){
- if(!escenaActual)return;
+
+ if(!escenaActual){
+  return;
+ }
 
  mostrarImagen(
   "ambiente",
@@ -273,74 +794,176 @@ function mostrarEscena(){
   "El ambiente de este horario aún no está subido."
  );
 
+ const imagenActividad=
+  obtenerImagenActividad();
+
  mostrarImagen(
   "actividad",
-  escenaActual.imagen,
-  "Actividad actual: "+escenaActual.nombre
+  imagenActividad,
+  "Actividad actual: "+
+  escenaActual.nombre+
+  ". Imagen pendiente para "+
+  VESTUARIOS[vestuarioActual].nombre+
+  "."
  );
 
- mostrarImagen(
-  "estado",
-  null,
-  "Emoción actual: "+escenaActual.emocion+" 💜"
- );
+ mostrarEstado();
 
- document.getElementById("mensaje").textContent=
- escenaActual.mensaje;
+ document.getElementById(
+  "mensaje"
+ ).textContent=
+  escenaActual.mensaje;
 }
 
+/* =====================================
+   ELEGIR ACTIVIDAD
+   ===================================== */
+
 function elegirActividad(){
+
  const ahora=new Date();
 
- temporadaActual=obtenerTemporada(ahora);
- periodoActual=obtenerPeriodo(ahora);
+ temporadaActual=obtenerTemporada(
+  ahora
+ );
+
+ periodoActual=obtenerPeriodo(
+  ahora
+ );
+
+ vestuarioActual=obtenerVestuario(
+  ahora
+ );
 
  actualizarTitulo();
 
- const disponibles=ACTIVIDADES[periodoActual]||[];
- const boton=document.getElementById("otra-actividad");
+ const disponibles=
+  ACTIVIDADES[periodoActual]||[];
 
- boton.disabled=disponibles.length===0;
+ const boton=document.getElementById(
+  "otra-actividad"
+ );
+
+ boton.disabled=
+  disponibles.length===0;
 
  if(disponibles.length===0){
+
   escenaActual=null;
   return;
+
  }
 
  let opciones=disponibles.filter(
-  escena=>escena!==escenaActual
+  escena=>
+   !escenaActual||
+   escena.id!==escenaActual.id
  );
 
- if(opciones.length===0)opciones=disponibles;
+ if(opciones.length===0){
+  opciones=disponibles;
+ }
 
  escenaActual=opciones[
-  Math.floor(Math.random()*opciones.length)
+  Math.floor(
+   Math.random()*opciones.length
+  )
  ];
+
+ ultimoCambio=Date.now();
 
  mostrarEscena();
 }
 
-function revisarHorario(){
- const ahora=new Date();
- const periodo=obtenerPeriodo(ahora);
- const temporada=obtenerTemporada(ahora);
+/* =====================================
+   REVISAR HORARIO Y VESTUARIO
+   ===================================== */
 
- if(periodo!==periodoActual||
-    temporada!==temporadaActual){
+function revisarHorario(){
+
+ const ahora=new Date();
+
+ const periodo=obtenerPeriodo(
+  ahora
+ );
+
+ const temporada=obtenerTemporada(
+  ahora
+ );
+
+ const vestuario=obtenerVestuario(
+  ahora
+ );
+
+ if(
+  periodo!==periodoActual||
+  temporada!==temporadaActual||
+  vestuario!==vestuarioActual
+ ){
+
   elegirActividad();
+  return;
+
+ }
+
+ // Cambiar actividad automáticamente
+ // cada 15 minutos.
+
+ const transcurrido=
+  Date.now()-ultimoCambio;
+
+ const intervalo=
+  MINUTOS_CAMBIO*60*1000;
+
+ if(transcurrido>=intervalo){
+
+  elegirActividad();
+
  }
 }
 
-document.getElementById("otra-actividad")
- .addEventListener("click",elegirActividad);
+/* =====================================
+   BOTÓN OTRA ACTIVIDAD
+   ===================================== */
+
+document.getElementById(
+ "otra-actividad"
+).addEventListener(
+ "click",
+ elegirActividad
+);
+
+/* =====================================
+   INICIAR CASA-LUMI
+   ===================================== */
 
 elegirActividad();
 
-setInterval(revisarHorario,60000);
+/* =====================================
+   REVISIÓN AUTOMÁTICA
+   ===================================== */
 
-document.addEventListener("visibilitychange",()=>{
- if(!document.hidden)revisarHorario();
-});
+setInterval(
+ revisarHorario,
+ 60000
+);
+
+/* =====================================
+   REGRESAR A LA APLICACIÓN
+   ===================================== */
+
+document.addEventListener(
+ "visibilitychange",
+ ()=>{
+
+  if(!document.hidden){
+   revisarHorario();
+  }
+
+ }
+);
+
 </script>
+
 </body>
 </html>
