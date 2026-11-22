@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#160b25">
+<title>Mi Sala de Estar | Casa-Lumi</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(
+    circle at top, #48245f, #160b25 80%
+  );
+  color: #fff0ff;
+  font-family: Arial, sans-serif;
+}
+
+main {
+  max-width: 680px;
+  margin: auto;
+  padding: 18px 12px 45px;
+}
+
+.volver {
+  display: inline-block;
+  color: #eac7ff;
+  text-decoration: none;
+  margin-bottom: 18px;
+}
+
+h1, h2, .subtitulo {
+  text-align: center;
+}
+
+h1 {
+  color: #f1caff;
+  margin-bottom: 8px;
+}
+
+.subtitulo {
+  color: #e2b5ff;
+  margin-bottom: 24px;
+}
+
+.casilla {
+  background: #29163d;
+  border: 3px solid #c77cff;
+  border-radius: 24px;
+  padding: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 18px #b76cff55;
+}
+
+.casilla h2 {
+  font-size: 20px;
+  color: #f1caff;
+}
+
+.casilla img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+}
+
+.oculto { display: none; }
+
+.aviso {
+  text-align: center;
+  line-height: 1.6;
+  padding: 20px;
+  color: #ead0ff;
+}
+
+#mensaje {
+  text-align: center;
+  line-height: 1.6;
+  color: #ead0ff;
+}
+
+button {
+  display: block;
+  margin: 20px auto;
+  padding: 13px 22px;
+  border: 2px solid #e4a9ff;
+  border-radius: 18px;
+  background: #643481;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+</style>
+</head>
+
+<body>
+<main>
+
+<a class="volver" href="index.html">
+  ← Volver a Casa-Lumi
+</a>
+
+<h1>💜 Mi Sala de Estar 💜</h1>
+
+<p class="subtitulo" id="temporada">
+  Preparando mi sala...
+</p>
+
+<!-- CASILLA 1: AMBIENTE -->
+<section class="casilla">
+  <h2>🏡 Mi ambiente</h2>
+  <img id="ambiente" alt="Sala de estar">
+  <p class="aviso oculto" id="aviso-ambiente">
+    Ambiente pendiente de subir.
+  </p>
+</section>
+
+<!-- CASILLA 2: ACTIVIDAD -->
+<section class="casilla">
+  <h2>✨ ¿Qué estoy haciendo?</h2>
+  <img id="actividad" alt="Actividad de Lumi">
+  <p class="aviso oculto" id="aviso-actividad">
+    Actividad pendiente de subir.
+  </p>
+</section>
+
+<!-- CASILLA 3: ESTADO -->
+<section class="casilla">
+  <h2>♡ Mi estado actual ♡</h2>
+  <img id="estado" alt="Estado de Lumi">
+  <p class="aviso oculto" id="aviso-estado">
+    Estado pendiente de subir.
+  </p>
+</section>
+
+<p id="mensaje" aria-live="polite"></p>
+
+<button id="otra-actividad" type="button">
+  ✨ Otra actividad
+</button>
+
+</main>
+
+<script>
+"use strict";
+
+/*
+ CASA-LUMI 💜
+ SALA DE ESTAR
+
+ Cada casilla tiene su propia imagen.
+ Los nombres deben coincidir con GitHub.
+*/
+
+const BASE = "assets/sala-estar/";
+
+/*
+ Catálogo inicial:
+ Fiestas Patrias, septiembre de Chile.
+
+ Agregaremos otras temporadas cuando
+ estén disponibles sus imágenes oficiales.
+*/
+
+const ESCENAS = {
+  fiestasPatrias: {
+    dia: [
+      {
+        nombre: "Jugando",
+        emocion: "Feliz",
+        actividad: "jugando",
+        estado: "estado-jugando"
+      }
+    ],
+    noche: [
+      {
+        nombre: "Leyendo",
+        emocion: "Tranquila",
+        actividad: "leyendo",
+        estado: "estado-leyendo"
+      },
+      {
+        nombre: "Tejiendo",
+        emocion: "Concentrada",
+        actividad: "tejiendo",
+        estado: "estado-tejiendo"
+      }
+    ]
+  }
+};
+
+let escenaActual = null;
+let periodoActual = "";
+let temporadaActual = "";
+
+function obtenerTemporada(fecha) {
+  const mes = fecha.getMonth() + 1;
+
+  if (mes === 9) return "fiestasPatrias";
+  if (mes === 12 || mes <= 2) return "verano";
+  if (mes >= 3 && mes <= 5) return "otono";
+  return "invierno";
+}
+
+function obtenerPeriodo(fecha) {
+  const hora = fecha.getHours();
+  return hora >= 7 && hora < 20
+    ? "dia"
+    : "noche";
+}
+
+function mostrarImagen(id, ruta) {
+  const imagen = document.getElementById(id);
+  const aviso = document.getElementById(
+    "aviso-" + id
+  );
+
+  imagen.classList.add("oculto");
+  aviso.classList.add("oculto");
+
+  imagen.onload = () => {
+    imagen.classList.remove("oculto");
+    aviso.classList.add("oculto");
+  };
+
+  imagen.onerror = () => {
+    imagen.classList.add("oculto");
+    aviso.classList.remove("oculto");
+  };
+
+  imagen.src = ruta;
+}
+
+function ocultarImagen(id) {
+  const imagen = document.getElementById(id);
+  imagen.removeAttribute("src");
+  imagen.classList.add("oculto");
+
+  document.getElementById(
+    "aviso-" + id
+  ).classList.remove("oculto");
+}
+
+function elegirActividad() {
+  const ahora = new Date();
+
+  temporadaActual = obtenerTemporada(ahora);
+  periodoActual = obtenerPeriodo(ahora);
+
+  const titulo = document.getElementById(
+    "temporada"
+  );
+
+  const mensaje = document.getElementById(
+    "mensaje"
+  );
+
+  const boton = document.getElementById(
+    "otra-actividad"
+  );
+
+  const nombres = {
+    fiestasPatrias: "🇨🇱 Fiestas Patrias",
+    verano: "☀️ Verano",
+    otono: "🍂 Otoño",
+    invierno: "❄️ Invierno"
+  };
+
+  titulo.textContent =
+    nombres[temporadaActual] +
+    (periodoActual === "dia"
+      ? " · De día"
+      : " · De noche");
+
+  const catalogo = ESCENAS[temporadaActual];
+
+  if (!catalogo) {
+    escenaActual = null;
+    boton.disabled = true;
+
+    ocultarImagen("ambiente");
+    ocultarImagen("actividad");
+    ocultarImagen("estado");
+
+    mensaje.textContent =
+      "Las escenas oficiales de esta temporada " +
+      "todavía no están integradas.";
+    return;
+  }
+
+  const disponibles = catalogo[periodoActual];
+
+  if (!disponibles || disponibles.length === 0) {
+    mensaje.textContent =
+      "Todavía no hay actividades para este horario.";
+    boton.disabled = true;
+    return;
+  }
+
+  boton.disabled = false;
+
+  let opciones = disponibles.filter(
+    escena => escena !== escenaActual
+  );
+
+  if (opciones.length === 0) {
+    opciones = disponibles;
+  }
+
+  const indice = Math.floor(
+    Math.random() * opciones.length
+  );
+
+  escenaActual = opciones[indice];
+
+  const carpeta = BASE +
+    temporadaActual + "/" +
+    periodoActual + "/";
+
+  mostrarImagen(
+    "ambiente",
+    carpeta + "ambiente.png"
+  );
+
+  mostrarImagen(
+    "actividad",
+    carpeta + escenaActual.actividad + ".png"
+  );
+
+  mostrarImagen(
+    "estado",
+    carpeta + escenaActual.estado + ".png"
+  );
+
+  mensaje.textContent =
+    "Lumi está " +
+    escenaActual.nombre.toLowerCase() +
+    ". Emoción: " +
+    escenaActual.emocion + " 💜";
+}
+
+document.getElementById(
+  "otra-actividad"
+).addEventListener(
+  "click",
+  elegirActividad
+);
+
+elegirActividad();
+</script>
+
+</body>
+</html>
+
