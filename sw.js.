@@ -1,32 +1,55 @@
 
 "use strict";
 
-/* CASA-LUMI 💜
-   Service Worker para Android PWA
-*/
+/* =====================================
+   CASA-LUMI 💜
+   SERVICE WORKER ANDROID PWA
+   ===================================== */
 
-const CACHE_NAME = "casa-lumi-v1";
+const CACHE_NAME = "casa-lumi-v2";
 const BASE = "/Casa-Lumi-Prueba-3/";
 
 const ARCHIVOS = [
   BASE,
-  BASE + "index.html",
   BASE + "styles.css",
   BASE + "app.js",
   BASE + "manifest.webmanifest"
 ];
 
-// Instalar
+/* INSTALACIÓN */
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) =>
-      cache.addAll(ARCHIVOS)
-    )
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+
+      await Promise.all(
+        ARCHIVOS.map(async (archivo) => {
+          try {
+            const respuesta = await fetch(archivo, {
+              cache: "reload"
+            });
+
+            if (respuesta.ok) {
+              await cache.put(archivo, respuesta);
+            }
+          } catch (error) {
+            console.warn(
+              "No se pudo guardar:",
+              archivo,
+              error
+            );
+          }
+        })
+      );
+
+      await self.skipWaiting();
+    })()
   );
-  self.skipWaiting();
 });
 
-// Activar y limpiar caché antigua
+/* ACTIVACIÓN Y LIMPIEZA */
+
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
@@ -46,7 +69,8 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Consultar la red primero y usar caché sin conexión
+/* ACTUALIZACIONES Y MODO SIN CONEXIÓN */
+
 self.addEventListener("fetch", (event) => {
   const solicitud = event.request;
 
@@ -55,6 +79,7 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(solicitud.url);
 
   if (url.origin !== self.location.origin) return;
+
   if (!url.pathname.startsWith(BASE)) return;
 
   event.respondWith(
@@ -64,15 +89,30 @@ self.addEventListener("fetch", (event) => {
 
         if (respuesta.ok) {
           const cache = await caches.open(CACHE_NAME);
-          await cache.put(solicitud, respuesta.clone());
+
+          await cache.put(
+            solicitud,
+            respuesta.clone()
+          );
         }
 
         return respuesta;
       } catch (error) {
         const guardado = await caches.match(solicitud);
-        if (guardado) return guardado;
 
-        throw error;
+        if (guardado) {
+          return guardado;
+        }
+
+        if (solicitud.mode === "navigate") {
+          const inicio = await caches.match(BASE);
+
+          if (inicio) {
+            return inicio;
+          }
+        }
+
+        return Response.error();
       }
     })()
   );
