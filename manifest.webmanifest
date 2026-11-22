@@ -5,7 +5,7 @@
   "description": "Un hogar mágico 2D con Lumi, Lulú, vestuario, emociones, calendario y muchas aventuras.",
   "lang": "es-CL",
   "dir": "ltr",
-  "start_url": "/Casa-Lumi-Prueba-3/index.html",
+  "start_url": "/Casa-Lumi-Prueba-3/",
   "scope": "/Casa-Lumi-Prueba-3/",
   "display": "standalone",
   "orientation": "any",
@@ -30,3 +30,4 @@
     }
   ]
 }
+
