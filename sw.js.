@@ -1,0 +1,79 @@
+
+"use strict";
+
+/* CASA-LUMI 💜
+   Service Worker para Android PWA
+*/
+
+const CACHE_NAME = "casa-lumi-v1";
+const BASE = "/Casa-Lumi-Prueba-3/";
+
+const ARCHIVOS = [
+  BASE,
+  BASE + "index.html",
+  BASE + "styles.css",
+  BASE + "app.js",
+  BASE + "manifest.webmanifest"
+];
+
+// Instalar
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) =>
+      cache.addAll(ARCHIVOS)
+    )
+  );
+  self.skipWaiting();
+});
+
+// Activar y limpiar caché antigua
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    (async () => {
+      const nombres = await caches.keys();
+
+      await Promise.all(
+        nombres
+          .filter((nombre) =>
+            nombre.startsWith("casa-lumi-") &&
+            nombre !== CACHE_NAME
+          )
+          .map((nombre) => caches.delete(nombre))
+      );
+
+      await self.clients.claim();
+    })()
+  );
+});
+
+// Consultar la red primero y usar caché sin conexión
+self.addEventListener("fetch", (event) => {
+  const solicitud = event.request;
+
+  if (solicitud.method !== "GET") return;
+
+  const url = new URL(solicitud.url);
+
+  if (url.origin !== self.location.origin) return;
+  if (!url.pathname.startsWith(BASE)) return;
+
+  event.respondWith(
+    (async () => {
+      try {
+        const respuesta = await fetch(solicitud);
+
+        if (respuesta.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(solicitud, respuesta.clone());
+        }
+
+        return respuesta;
+      } catch (error) {
+        const guardado = await caches.match(solicitud);
+        if (guardado) return guardado;
+
+        throw error;
+      }
+    })()
+  );
+});
