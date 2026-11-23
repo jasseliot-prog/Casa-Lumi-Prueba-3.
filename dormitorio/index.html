@@ -1,0 +1,136 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#160b25">
+<title>Mi Dormitorio | Casa-Lumi</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #10051c;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.escenario {
+  position: relative;
+  width: 100%;
+  max-width: 1536px;
+  margin: auto;
+}
+
+.fondo {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Zonas táctiles de los botones */
+.boton {
+  position: absolute;
+  top: 1%;
+  height: 10%;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.inicio { left: 28%; width: 6%; }
+.hogar { left: 35%; width: 7%; }
+.closet { left: 43%; width: 7%; }
+.lulu { left: 51%; width: 7%; }
+.calendario { left: 59%; width: 7%; }
+.musica { left: 67%; width: 7%; }
+.asistente { left: 75%; width: 6%; }
+
+/* Reloj funcional */
+.reloj {
+  position: absolute;
+  top: 3.5%;
+  left: 86%;
+  width: 8%;
+  color: white;
+  text-align: center;
+  font-size: clamp(9px, 2.6vw, 37px);
+  font-weight: bold;
+  text-shadow: 0 0 8px #b64aff;
+  background: #180626;
+}
+
+@media (max-width: 600px) {
+  .escenario {
+    min-width: 600px;
+  }
+
+  body {
+    overflow-x: auto;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main class="escenario">
+  <img
+    class="fondo"
+    src="../dormitorio.png"
+    alt="Dormitorio mágico de Lumi"
+  >
+
+  <a class="boton inicio"
+     href="../index.html"
+     aria-label="Inicio"></a>
+
+  <a class="boton hogar"
+     href="../index.html"
+     aria-label="Hogar"></a>
+
+  <a class="boton closet"
+     href="../dressingroom/"
+     aria-label="Clóset"></a>
+
+  <a class="boton lulu"
+     href="../index.html"
+     aria-label="Lulú"></a>
+
+  <a class="boton calendario"
+     href="../calendario/"
+     aria-label="Calendario"></a>
+
+  <a class="boton musica"
+     href="../index.html"
+     aria-label="Música"></a>
+
+  <a class="boton asistente"
+     href="../index.html"
+     aria-label="Asistente"></a>
+
+  <div class="reloj" id="reloj">00:00</div>
+</main>
+
+<script>
+"use strict";
+
+function actualizarReloj() {
+  const ahora = new Date();
+
+  const hora = ahora.toLocaleTimeString("es-CL", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  });
+
+  document.getElementById("reloj").textContent = hora;
+}
+
+actualizarReloj();
+setInterval(actualizarReloj, 1000);
+</script>
+
+</body>
+</html>
