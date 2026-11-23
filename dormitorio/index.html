@@ -3,8 +3,10 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#160b25">
+
 <title>Mi Dormitorio | Casa-Lumi</title>
 
 <style>
@@ -19,7 +21,7 @@ body {
   font-family: Arial, sans-serif;
 }
 
-/* Escenario principal */
+/* Escenario oficial */
 .escenario {
   position: relative;
   width: 100%;
@@ -28,14 +30,13 @@ body {
   overflow: hidden;
 }
 
-/* Imagen del dormitorio */
 .fondo {
   display: block;
   width: 100%;
   height: auto;
 }
 
-/* Botones invisibles sobre la ilustración */
+/* Navegación sobre la ilustración */
 .boton {
   position: absolute;
   top: 1%;
@@ -47,11 +48,10 @@ body {
 }
 
 .boton:focus-visible {
-  outline: 3px solid #ffffff;
+  outline: 3px solid white;
   outline-offset: 2px;
 }
 
-/* Navegación */
 .inicio {
   left: 27%;
   width: 7%;
@@ -87,29 +87,37 @@ body {
   width: 7%;
 }
 
-/* Reloj real */
+/* Reloj automático */
 .reloj {
   position: absolute;
   top: 3%;
   left: 86%;
   width: 8%;
   z-index: 6;
-
-  color: #ffffff;
+  color: white;
   text-align: center;
-  font-size: clamp(10px, 2.2vw, 34px);
+  font-size: clamp(8px, 2.2vw, 34px);
   font-weight: bold;
-
   text-shadow:
     0 0 6px #b64aff,
     0 0 12px #b64aff;
-
   background: #180626;
   border-radius: 8px;
   padding: 2px;
 }
 
-/* Ajustes para celulares */
+/* Mensaje si falta la imagen */
+.error-imagen {
+  display: none;
+  padding: 30px 15px;
+  text-align: center;
+}
+
+.error-imagen a {
+  color: #e9c4ff;
+}
+
+/* Adaptación para celular */
 @media (max-width: 600px) {
   .escenario {
     width: 100%;
@@ -121,7 +129,8 @@ body {
   }
 
   .reloj {
-    font-size: clamp(8px, 2.2vw, 15px);
+    font-size: clamp(7px, 2.2vw, 15px);
+    padding: 0;
   }
 }
 </style>
@@ -136,57 +145,49 @@ body {
     class="fondo"
     src="dormitorio-casa-lumi.png"
     alt="Dormitorio mágico de Lumi"
+    onerror="this.style.display='none';
+      document.getElementById('error-imagen')
+      .style.display='block';"
   >
 
-  <!-- Navegación principal -->
+  <div class="error-imagen" id="error-imagen">
+    <p>No se pudo cargar la imagen del dormitorio.</p>
+    <a href="../index.html">Volver al Inicio</a>
+  </div>
 
-  <a
-    class="boton inicio"
-    href="../index.html"
-    aria-label="Inicio">
-  </a>
+  <!-- Botones del diseño -->
+  <a class="boton inicio"
+     href="../index.html"
+     aria-label="Inicio"></a>
 
-  <a
-    class="boton hogar"
-    href="../index.html"
-    aria-label="Hogar">
-  </a>
+  <a class="boton hogar"
+     href="../index.html"
+     aria-label="Hogar"></a>
 
-  <a
-    class="boton closet"
-    href="../dressingroom/"
-    aria-label="Clóset">
-  </a>
+  <a class="boton closet"
+     href="../dressingroom/vestidor.html"
+     aria-label="Clóset"></a>
 
-  <a
-    class="boton lulu"
-    href="../index.html"
-    aria-label="Lulú">
-  </a>
+  <a class="boton lulu"
+     href="../index.html"
+     aria-label="Lulú"></a>
 
-  <a
-    class="boton calendario"
-    href="../calendario/"
-    aria-label="Calendario">
-  </a>
+  <a class="boton calendario"
+     href="../calendario/index.html"
+     aria-label="Calendario"></a>
 
-  <a
-    class="boton musica"
-    href="../index.html"
-    aria-label="Música">
-  </a>
+  <a class="boton musica"
+     href="../index.html"
+     aria-label="Música"></a>
 
-  <a
-    class="boton asistente"
-    href="../index.html"
-    aria-label="Asistente">
-  </a>
+  <a class="boton asistente"
+     href="../index.html"
+     aria-label="Asistente"></a>
 
   <!-- Reloj -->
-  <div
-    class="reloj"
-    id="reloj"
-    aria-label="Hora actual">
+  <div class="reloj"
+       id="reloj"
+       aria-label="Hora actual">
     00:00
   </div>
 
@@ -195,29 +196,22 @@ body {
 <script>
 "use strict";
 
-/* Reloj automático */
 function actualizarReloj() {
-  const ahora = new Date();
-
-  const hora = ahora.toLocaleTimeString("es-CL", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false
-  });
-
   const reloj = document.getElementById("reloj");
+  if (!reloj) return;
 
-  if (reloj) {
-    reloj.textContent = hora;
-  }
+  reloj.textContent = new Date().toLocaleTimeString(
+    "es-CL",
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    }
+  );
 }
 
-/* Iniciar reloj */
 actualizarReloj();
-
-/* Actualizar cada segundo */
-setInterval(actualizarReloj, 1000);
-
+setInterval(actualizarReloj, 30000);
 </script>
 
 </body>
