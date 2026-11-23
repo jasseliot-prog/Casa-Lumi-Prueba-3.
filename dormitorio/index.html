@@ -8,7 +8,9 @@
 <title>Mi Dormitorio | Casa-Lumi</title>
 
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -17,57 +19,109 @@ body {
   font-family: Arial, sans-serif;
 }
 
+/* Escenario principal */
 .escenario {
   position: relative;
   width: 100%;
   max-width: 1536px;
-  margin: auto;
+  margin: 0 auto;
+  overflow: hidden;
 }
 
+/* Imagen del dormitorio */
 .fondo {
   display: block;
   width: 100%;
   height: auto;
 }
 
-/* Zonas táctiles de los botones */
+/* Botones invisibles sobre la ilustración */
 .boton {
   position: absolute;
   top: 1%;
   height: 10%;
-  z-index: 2;
+  z-index: 5;
   cursor: pointer;
+  border-radius: 12px;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.inicio { left: 28%; width: 6%; }
-.hogar { left: 35%; width: 7%; }
-.closet { left: 43%; width: 7%; }
-.lulu { left: 51%; width: 7%; }
-.calendario { left: 59%; width: 7%; }
-.musica { left: 67%; width: 7%; }
-.asistente { left: 75%; width: 6%; }
+.boton:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+}
 
-/* Reloj funcional */
+/* Navegación */
+.inicio {
+  left: 27%;
+  width: 7%;
+}
+
+.hogar {
+  left: 35%;
+  width: 7%;
+}
+
+.closet {
+  left: 43%;
+  width: 7%;
+}
+
+.lulu {
+  left: 51%;
+  width: 7%;
+}
+
+.calendario {
+  left: 59%;
+  width: 7%;
+}
+
+.musica {
+  left: 67%;
+  width: 7%;
+}
+
+.asistente {
+  left: 75%;
+  width: 7%;
+}
+
+/* Reloj real */
 .reloj {
   position: absolute;
-  top: 3.5%;
+  top: 3%;
   left: 86%;
   width: 8%;
-  color: white;
+  z-index: 6;
+
+  color: #ffffff;
   text-align: center;
-  font-size: clamp(9px, 2.6vw, 37px);
+  font-size: clamp(10px, 2.2vw, 34px);
   font-weight: bold;
-  text-shadow: 0 0 8px #b64aff;
+
+  text-shadow:
+    0 0 6px #b64aff,
+    0 0 12px #b64aff;
+
   background: #180626;
+  border-radius: 8px;
+  padding: 2px;
 }
 
+/* Ajustes para celulares */
 @media (max-width: 600px) {
   .escenario {
-    min-width: 600px;
+    width: 100%;
   }
 
-  body {
-    overflow-x: auto;
+  .boton {
+    top: 1%;
+    height: 11%;
+  }
+
+  .reloj {
+    font-size: clamp(8px, 2.2vw, 15px);
   }
 }
 </style>
@@ -76,46 +130,72 @@ body {
 <body>
 
 <main class="escenario">
+
+  <!-- Imagen oficial del dormitorio -->
   <img
     class="fondo"
-    src="../dormitorio.png"
+    src="dormitorio-casa-lumi.png"
     alt="Dormitorio mágico de Lumi"
   >
 
-  <a class="boton inicio"
-     href="../index.html"
-     aria-label="Inicio"></a>
+  <!-- Navegación principal -->
 
-  <a class="boton hogar"
-     href="../index.html"
-     aria-label="Hogar"></a>
+  <a
+    class="boton inicio"
+    href="../index.html"
+    aria-label="Inicio">
+  </a>
 
-  <a class="boton closet"
-     href="../dressingroom/"
-     aria-label="Clóset"></a>
+  <a
+    class="boton hogar"
+    href="../index.html"
+    aria-label="Hogar">
+  </a>
 
-  <a class="boton lulu"
-     href="../index.html"
-     aria-label="Lulú"></a>
+  <a
+    class="boton closet"
+    href="../dressingroom/"
+    aria-label="Clóset">
+  </a>
 
-  <a class="boton calendario"
-     href="../calendario/"
-     aria-label="Calendario"></a>
+  <a
+    class="boton lulu"
+    href="../index.html"
+    aria-label="Lulú">
+  </a>
 
-  <a class="boton musica"
-     href="../index.html"
-     aria-label="Música"></a>
+  <a
+    class="boton calendario"
+    href="../calendario/"
+    aria-label="Calendario">
+  </a>
 
-  <a class="boton asistente"
-     href="../index.html"
-     aria-label="Asistente"></a>
+  <a
+    class="boton musica"
+    href="../index.html"
+    aria-label="Música">
+  </a>
 
-  <div class="reloj" id="reloj">00:00</div>
+  <a
+    class="boton asistente"
+    href="../index.html"
+    aria-label="Asistente">
+  </a>
+
+  <!-- Reloj -->
+  <div
+    class="reloj"
+    id="reloj"
+    aria-label="Hora actual">
+    00:00
+  </div>
+
 </main>
 
 <script>
 "use strict";
 
+/* Reloj automático */
 function actualizarReloj() {
   const ahora = new Date();
 
@@ -125,11 +205,19 @@ function actualizarReloj() {
     hour12: false
   });
 
-  document.getElementById("reloj").textContent = hora;
+  const reloj = document.getElementById("reloj");
+
+  if (reloj) {
+    reloj.textContent = hora;
+  }
 }
 
+/* Iniciar reloj */
 actualizarReloj();
+
+/* Actualizar cada segundo */
 setInterval(actualizarReloj, 1000);
+
 </script>
 
 </body>
