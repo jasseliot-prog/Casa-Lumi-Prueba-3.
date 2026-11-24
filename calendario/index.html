@@ -1,5 +1,5 @@
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -9,110 +9,129 @@
 
 <style>
 *{box-sizing:border-box}
-
 body{
  margin:0;
  min-height:100vh;
- background:radial-gradient(circle at top,#44245f,#160b25 75%);
- color:#f7edff;
+ color:#f9eaff;
  font-family:Arial,sans-serif;
+ background:radial-gradient(circle at top,#44245f,#160b25 75%);
 }
-main{max-width:760px;margin:auto;padding:20px 14px 50px}
-h1,h2{text-align:center;color:#e5bdff}
+main{max-width:760px;margin:auto;padding:20px 12px 50px}
+h1,h2{text-align:center;color:#edcaff}
 a{color:#ead0ff}
 .panel{
  background:#29183d;
  border:2px solid #8154a6;
  border-radius:22px;
- padding:16px;
+ padding:14px;
  margin:18px 0;
- box-shadow:0 0 20px #a865ee25;
+ box-shadow:0 0 20px #a865ee35;
 }
-.cabecera,.controles,.acciones,.botones{
+.calendario{
+ position:relative;
+ isolation:isolate;
+ overflow:hidden;
+ border-color:#d19aff;
+ background:#251334;
+}
+.calendario::before{
+ content:"";
+ position:absolute;
+ inset:0;
+ z-index:-2;
+ background-image:var(--fondo,none);
+ background-size:cover;
+ background-position:center;
+}
+.calendario::after{
+ content:"";
+ position:absolute;
+ inset:0;
+ z-index:-1;
+ pointer-events:none;
+ background:
+ radial-gradient(circle,#f5caff 1px,transparent 2px) 0 0/43px 43px,
+ linear-gradient(145deg,#170b2966,#29133d88);
+}
+.cabecera,.acciones{
  display:flex;
  align-items:center;
  justify-content:space-between;
  gap:8px;
- flex-wrap:wrap;
 }
-.cabecera{flex-wrap:nowrap}
+.acciones{flex-wrap:wrap}
 .cabecera h2{
- flex:1;
- font-size:clamp(17px,4vw,25px);
- text-transform:capitalize;
+ font-size:clamp(16px,4vw,24px);
+ text-shadow:0 0 12px #c77dff;
 }
-button,input,select,textarea{
+button,input,textarea,select{
  font:inherit;
- border-radius:12px;
- border:1px solid #ab80d0;
  padding:11px;
+ color:#fff;
  background:#3c2454;
- color:white;
+ border:1px solid #b88ad9;
+ border-radius:12px;
 }
 button{cursor:pointer;background:#69378c}
 button:hover{background:#8451aa}
-button:focus-visible,input:focus-visible,
-select:focus-visible,textarea:focus-visible{
- outline:3px solid #e7b9ff;
- outline-offset:2px;
-}
-input:not([type=checkbox]),select,textarea{
+input,textarea,select{
  width:100%;
- margin:5px 0 12px;
-}
-input[type=date],input[type=time]{
+ margin:6px 0 12px;
  color-scheme:dark;
- min-height:46px;
 }
-label{display:block;font-size:14px;color:#e9d2fa}
+label{display:block;color:#ead0ff}
 .semana,.dias{
  display:grid;
  grid-template-columns:repeat(7,minmax(0,1fr));
- gap:5px;
+ gap:4px;
 }
 .semana{
  text-align:center;
  font-size:12px;
- color:#d6b6ee;
+ padding:12px 0;
+ background:#251334bb;
+ border-radius:12px;
  margin:12px 0;
 }
 .dia{
- min-height:69px;
- text-align:left;
+ position:relative;
+ min-height:76px;
  padding:6px;
- overflow-wrap:anywhere;
- background:#3c2454;
- border:1px solid #77518f;
- border-radius:11px;
+ text-align:left;
+ border:1px solid #d5a1ff99;
+ border-radius:12px;
+ background:linear-gradient(145deg,#a56bd044,#28143c99);
+ backdrop-filter:blur(1px);
 }
-.vacio{visibility:hidden}
-.hoy{
+.dia::after{
+ content:"✧";
+ position:absolute;
+ top:4px;
+ right:5px;
+ font-size:10px;
+ color:#edcaff;
+}
+.dia.hoy{
  border:2px solid #f5c4ff;
- box-shadow:0 0 10px #d99aff70;
+ box-shadow:0 0 12px #d99aff99;
 }
-.seleccionado{
- background:#9863bc;
+.dia.hoy::after{content:"♡"}
+.dia.seleccionado{
+ background:#9a5cc6bb;
  border:2px solid #f2caff;
 }
-.numero{display:block;font-weight:bold;font-size:16px}
-.marcas{font-size:11px;margin-top:4px;color:#f6d0ff}
-#seleccion{font-weight:bold;color:#f3caff;line-height:1.5}
-.evento,.resultado{
- border-left:3px solid #cf9eff;
- background:#3c2454;
- border-radius:10px;
+.numero{font-weight:bold;text-shadow:0 0 6px #d4a0ff}
+.marcas{font-size:11px;margin-top:7px;color:#ffc8f5}
+.evento{
  padding:12px;
  margin:10px 0;
+ background:#3c2454;
+ border-left:3px solid #cf9eff;
+ border-radius:12px;
  overflow-wrap:anywhere;
 }
-.evento p,.resultado p{white-space:pre-wrap}
-.acciones{justify-content:flex-start;margin-top:10px}
-.acciones button{padding:9px}
-.aviso{color:#e7d3f7;font-size:14px;line-height:1.6}
-#mensaje,#estadoHerramientas{color:#a5f3bf}
-.botones button{flex:1;min-width:140px}
+.aviso{font-size:13px;line-height:1.5;color:#e7d3f7}
 .oculto{display:none!important}
-
 .escena{
  position:fixed;
  inset:0;
@@ -124,111 +143,92 @@ label{display:block;font-size:14px;color:#e9d2fa}
  padding:18px;
 }
 .escena-contenido{
- width:min(100%,400px);
+ width:min(100%,460px);
+ max-height:90vh;
+ overflow:auto;
+ padding:20px;
+ text-align:center;
+ background:linear-gradient(145deg,#46245f,#251334);
  border:3px solid #c58bea;
  border-radius:26px;
- background:linear-gradient(145deg,#46245f,#251334);
- padding:22px;
- text-align:center;
  box-shadow:0 0 40px #b65dff70;
 }
-.escena-arte{
- height:210px;
- display:flex;
- align-items:center;
- justify-content:center;
- gap:8px;
- background:radial-gradient(circle,#73509a,#2a193c);
- border-radius:20px;
-}
-.lumi-figura{
- position:relative;
- font-size:100px;
- animation:escribir .8s infinite alternate;
-}
-.lumi-figura:after{
- content:"✏️";
- position:absolute;
- right:-8px;
- bottom:5px;
- font-size:40px;
-}
-.cuaderno{font-size:85px}
-@keyframes escribir{
- to{transform:translateY(5px) rotate(-3deg)}
-}
-@media(max-width:480px){
- .panel{padding:12px}
- .semana,.dias{gap:3px}
- .dia{min-height:59px;padding:4px;font-size:13px}
- .numero{font-size:14px}
- .marcas{font-size:10px}
-}
-@media(prefers-reduced-motion:reduce){
- .lumi-figura{animation:none}
-}
-.lumi-gif{
+#imagenLumi{
  width:100%;
- max-width:300px;
- max-height:260px;
+ max-height:55vh;
  object-fit:contain;
  border-radius:18px;
 }
- 
+#mensaje{color:#c2f5d4}
+@media(max-width:480px){
+ .dia{min-height:65px;padding:4px}
+ .panel{padding:10px}
+ .marcas{font-size:10px}
+}
 </style>
 </head>
 
 <body>
 <main>
-<a href="../index.html#inicio">← Volver a Casa-Lumi</a>
-<h1>📅 Calendario Mágico ✨</h1>
-<p style="text-align:center">Tus fechas importantes, guardadas con cariño 💜</p>
 
-<section class="panel">
+<a href="../index.html">← Volver a Casa-Lumi</a>
+
+<h1>📅 Calendario Mágico ✨</h1>
+
+<section class="panel calendario" id="panelCalendario">
+
  <div class="cabecera">
-  <button id="anterior" type="button" aria-label="Mes anterior">❮</button>
-  <h2 id="mes">Cargando calendario...</h2>
-  <button id="siguiente" type="button" aria-label="Mes siguiente">❯</button>
+  <button id="anterior">❮</button>
+  <h2 id="mes"></h2>
+  <button id="siguiente">❯</button>
  </div>
- <div class="controles">
-  <button id="hoy" type="button">Ir a hoy</button>
-  <span id="seleccion"></span>
- </div>
+
+ <button id="hoy">Ir a hoy</button>
+ <p id="seleccion"></p>
+
  <div class="semana">
-  <span>Lun</span><span>Mar</span><span>Mié</span>
-  <span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+  <span>Lun</span>
+  <span>Mar</span>
+  <span>Mié</span>
+  <span>Jue</span>
+  <span>Vie</span>
+  <span>Sáb</span>
+  <span>Dom</span>
  </div>
- <div id="dias" class="dias"></div>
- <p class="aviso">💜 Evento · 🔔 Recordatorio · ✨ Celebración</p>
+
+ <div class="dias" id="dias"></div>
+
+ <p class="aviso">
+  💜 Evento · 🔔 Recordatorio · ✨ Celebración
+ </p>
+
 </section>
 
 <section class="panel">
  <h2>🔎 Buscar eventos</h2>
- <label for="buscarEvento">Nombre o descripción</label>
- <input id="buscarEvento" type="search"
-        placeholder="Ej. Cumpleaños, reunión...">
- <div id="resultadosBusqueda"></div>
+ <input id="buscar" type="search" placeholder="Buscar...">
+ <div id="resultados"></div>
 </section>
 
 <section class="panel">
  <h2>✏️ Crear o editar evento</h2>
+
  <form id="formulario">
-  <input type="hidden" id="idEvento">
+  <input id="idEvento" type="hidden">
 
-  <label for="titulo">Nombre del evento</label>
-  <input id="titulo" maxlength="100" required
-         placeholder="Ej. Cumpleaños">
+  <label>Nombre del evento</label>
+  <input id="titulo" required maxlength="100">
 
-  <label for="fecha">Fecha</label>
+  <label>Fecha</label>
   <input id="fecha" type="date" required>
 
-  <label for="hora">Hora (opcional)</label>
+  <label>Hora</label>
   <input id="hora" type="time">
 
-  <label for="descripcion">Descripción</label>
-  <textarea id="descripcion" rows="3" maxlength="1000"></textarea>
+  <label>Descripción</label>
+  <textarea id="descripcion" rows="3"></textarea>
 
-  <label for="recordatorio">🔔 Recordatorio</label>
+  <label>Recordatorio</label>
   <select id="recordatorio">
    <option value="0">Sin recordatorio</option>
    <option value="10">10 minutos antes</option>
@@ -238,9 +238,10 @@ label{display:block;font-size:14px;color:#e9d2fa}
 
   <div class="acciones">
    <button type="submit" id="guardar">💜 Guardar evento</button>
-   <button type="button" id="cancelar">Cancelar edición</button>
+   <button type="button" id="cancelar">Cancelar</button>
   </div>
  </form>
+
  <p id="mensaje" role="status"></p>
 </section>
 
@@ -250,58 +251,166 @@ label{display:block;font-size:14px;color:#e9d2fa}
 </section>
 
 <section class="panel">
- <h2>🔔 Recordatorios pendientes</h2>
+ <h2>🔔 Recordatorios</h2>
  <div id="pendientes"></div>
  <p class="aviso">
-  Los avisos de Casa-Lumi aparecen mientras la página está abierta.
-  Para recibirlos con la página cerrada, guarda el evento en
-  Google Calendar y activa allí su notificación.
+  Los avisos funcionan mientras Casa-Lumi está abierta.
  </p>
 </section>
 
 <section class="panel">
  <h2>📦 Copias de seguridad</h2>
- <div class="botones">
-  <button id="exportar" type="button">📥 Exportar eventos</button>
-  <button id="importar" type="button">📤 Importar eventos</button>
+ <div class="acciones">
+  <button id="exportar">Exportar eventos</button>
+  <button id="importar">Importar eventos</button>
  </div>
- <input id="archivo" type="file"
-        accept=".json,application/json" class="oculto">
- <p id="estadoHerramientas" role="status"></p>
+ <input id="archivo" type="file" accept=".json" class="oculto">
 </section>
 
-<p class="aviso">
- Los eventos de Casa-Lumi se guardan en este navegador.
- No se sincronizan automáticamente entre dispositivos.
-</p>
 </main>
 
-<div id="escenaLumi" class="escena oculto"
-     role="dialog" aria-modal="true"
-     aria-labelledby="tituloEscena">
+<div id="escenaLumi" class="escena oculto">
  <div class="escena-contenido">
-  <h2 id="tituloEscena">✨ Lumi está anotando...</h2>
-  <div class="escena-arte">
-   <img src="lumi-escribiendo.gif" alt="Lumi escribiendo" class="lumi-gif">
-   
-  </div>
-  <p id="mensajeEscena">
-   Un momentito, estoy anotando tu evento...
-  </p>
-  <button id="cerrarEscena" type="button">💜 Continuar</button>
-  <p class="aviso">Animación provisional hasta incorporar el GIF oficial de Lumi.</p>
+  <h2>💜 ¡Evento guardado!</h2>
+  <img id="imagenLumi" class="oculto" alt="Escritorio de Lumi">
+  <p id="estadoLumi"></p>
+  <p>Tu evento quedó guardado correctamente.</p>
+  <button id="cerrarEscena">Continuar</button>
  </div>
 </div>
 
 <script>
 "use strict";
 
-const $=id=>document.getElementById(id);
-const CLAVE="casa-lumi-calendario-v1";
-const mesFmt=new Intl.DateTimeFormat("es-CL",{month:"long",year:"numeric"});
-const diaFmt=new Intl.DateTimeFormat("es-CL",{
- weekday:"long",day:"numeric",month:"long",year:"numeric"
+const $ = id => document.getElementById(id);
+const CLAVE = "casa-lumi-calendario-v1";
+
+const FONDOS = {
+ dia:"../assets/escritorio/escritorio-vacio-dia.png",
+ tarde:"../assets/escritorio/escritorio-vacio-tarde.png",
+ noche:"../assets/escritorio/escritorio-vacio-noche.png"
+};
+
+const ROPAS = [
+ "ano-nuevo",
+ "cocinera",
+ "fiestas-patrias",
+ "halloween",
+ "invierno",
+ "navidad",
+ "otono",
+ "pijama-invierno",
+ "pijama-verano",
+ "primavera",
+ "san-valentin",
+ "verano"
+];
+
+const AMBIENTES = ["dia","tarde","noche"];
+const IMAGENES = {};
+
+ROPAS.forEach(ropa=>{
+ IMAGENES[ropa]={};
+ AMBIENTES.forEach(ambiente=>{
+  IMAGENES[ropa][ambiente]=
+   "../assets/escritorio/organizando-"+
+   ropa+"-"+ambiente+".png";
+ });
 });
+
+function obtenerAmbiente(){
+ const h=new Date().getHours();
+ if(h>=6 && h<13)return "dia";
+ if(h>=13 && h<20)return "tarde";
+ return "noche";
+}
+
+function obtenerVestuario(){
+ try{
+  const estado=JSON.parse(
+   localStorage.getItem("casaLumi.v1")||"{}"
+  );
+  const ropa=String(estado.outfit||"")
+   .toLowerCase()
+   .normalize("NFD")
+   .replace(/[\u0300-\u036f]/g,"")
+   .trim()
+   .replace(/[\s_]+/g,"-");
+  return ROPAS.includes(ropa)?ropa:null;
+ }catch{
+  return null;
+ }
+}
+
+let ultimoAmbiente=null;
+
+function actualizarFondo(){
+ const ambiente=obtenerAmbiente();
+ if(ambiente===ultimoAmbiente)return;
+ ultimoAmbiente=ambiente;
+ $("panelCalendario").style.setProperty(
+  "--fondo",`url("${FONDOS[ambiente]}")`
+ );
+}
+
+let ultimaEscena=null;
+
+function actualizarEscena(){
+ const ambiente=obtenerAmbiente();
+ const ropa=obtenerVestuario();
+ const clave=ropa+"-"+ambiente;
+
+ if(clave===ultimaEscena)return;
+ ultimaEscena=clave;
+
+ const img=$("imagenLumi");
+ img.classList.add("oculto");
+
+ $("estadoLumi").textContent=
+  "Escritorio · "+ambiente+(ropa?" · "+ropa:"");
+
+ const rutas=[];
+ if(ropa)rutas.push(IMAGENES[ropa][ambiente]);
+ rutas.push(FONDOS[ambiente]);
+
+ function intentar(i){
+  if(clave!==ultimaEscena)return;
+  if(i>=rutas.length)return;
+  const prueba=new Image();
+  prueba.onload=()=>{
+   if(clave!==ultimaEscena)return;
+   img.src=rutas[i];
+   img.classList.remove("oculto");
+  };
+  prueba.onerror=()=>intentar(i+1);
+  prueba.src=rutas[i];
+ }
+ intentar(0);
+}
+
+function mostrarEscena(){
+ ultimaEscena=null;
+ $("escenaLumi").classList.remove("oculto");
+ actualizarEscena();
+}
+
+$("cerrarEscena").onclick=()=>{
+ $("escenaLumi").classList.add("oculto");
+ ultimaEscena=null;
+};
+
+actualizarFondo();
+
+setInterval(()=>{
+ actualizarFondo();
+ if(!$("escenaLumi").classList.contains("oculto")){
+  actualizarEscena();
+ }
+},1000);
+
+// FIN PARTE 1
+ 
+// INICIO PARTE 2
 
 function fechaLocal(d){
  return [
@@ -310,59 +419,51 @@ function fechaLocal(d){
   String(d.getDate()).padStart(2,"0")
  ].join("-");
 }
+
 function fechaObjeto(s){
  const [y,m,d]=s.split("-").map(Number);
  return new Date(y,m-1,d);
 }
-function fechaValida(s){
- if(typeof s!=="string"||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(s))return false;
- const [y,m,d]=s.split("-").map(Number);
- const f=new Date(y,m-1,d);
- return y>=1000&&f.getFullYear()===y&&f.getMonth()===m-1&&f.getDate()===d;
-}
-function horaValida(s){
- return s===""||(typeof s==="string"&&/^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(s));
-}
-function normalizar(e){
- if(!e||typeof e.id!=="string"||!e.id||
- typeof e.titulo!=="string"||!e.titulo.trim()||e.titulo.length>100||
- !fechaValida(e.fecha)||!horaValida(e.hora??"")||
- typeof(e.descripcion??"")!=="string"||(e.descripcion??"").length>1000||
- ![0,10,60,1440].includes(Number(e.recordatorio??0)))return null;
 
- return {
-  id:e.id,
-  titulo:e.titulo.trim(),
-  fecha:e.fecha,
-  hora:e.hora??"",
-  descripcion:e.descripcion??"",
-  recordatorio:Number(e.recordatorio??0)
- };
+function valido(e){
+ return e &&
+ typeof e.id==="string" &&
+ typeof e.titulo==="string" &&
+ e.titulo.trim() &&
+ typeof e.fecha==="string" &&
+ /^\d{4}-\d{2}-\d{2}$/.test(e.fecha) &&
+ fechaLocal(fechaObjeto(e.fecha))===e.fecha &&
+ typeof e.hora==="string" &&
+ (e.hora===""||/^([01]\d|2[0-3]):[0-5]\d$/.test(e.hora)) &&
+ typeof e.descripcion==="string" &&
+ [0,10,60,1440].includes(Number(e.recordatorio));
 }
 
 let eventos=[];
+
 try{
  const datos=JSON.parse(localStorage.getItem(CLAVE)||"[]");
- if(Array.isArray(datos))eventos=datos.map(normalizar).filter(Boolean);
+ if(Array.isArray(datos))eventos=datos.filter(valido);
 }catch(error){
- console.warn("Error al cargar eventos",error);
+ console.warn(error);
 }
 
-const inicial=new Date();
-let vista=new Date(inicial.getFullYear(),inicial.getMonth(),1);
-let elegida=fechaLocal(inicial);
+let elegida=fechaLocal(new Date());
+let vista=fechaObjeto(elegida);
+vista.setDate(1);
 
 function guardarDatos(){
  try{
   localStorage.setItem(CLAVE,JSON.stringify(eventos));
   return true;
- }catch(error){
-  $("mensaje").textContent="⚠️ No se pudieron guardar los datos.";
+ }catch{
+  $("mensaje").textContent="No se pudieron guardar los eventos.";
   return false;
  }
 }
-function celebraciones(fecha){
- const especiales={
+
+function celebracion(fecha){
+ const fechas={
   "01-01":"🎆 Año Nuevo",
   "02-14":"💗 San Valentín",
   "09-18":"🇨🇱 Fiestas Patrias",
@@ -370,267 +471,182 @@ function celebraciones(fecha){
   "10-31":"🎃 Halloween",
   "12-25":"🎄 Navidad"
  };
- return especiales[fecha.slice(5)]?[especiales[fecha.slice(5)]]:[];
-}
-function texto(prefijo,valor){
- const p=document.createElement("p"),b=document.createElement("strong");
- b.textContent=prefijo;
- p.append(b,document.createTextNode(valor));
- return p;
+ return fechas[fecha.slice(5)]||"";
 }
 
 function render(){
- const nombre=mesFmt.format(vista);
- $("mes").textContent=nombre.charAt(0).toUpperCase()+nombre.slice(1);
- const seleccion=diaFmt.format(fechaObjeto(elegida));
- $("seleccion").textContent="Día: "+seleccion.charAt(0).toUpperCase()+seleccion.slice(1);
+ const y=vista.getFullYear();
+ const m=vista.getMonth();
+
+ $("mes").textContent="☾ "+vista.toLocaleDateString(
+  "es-CL",{month:"long",year:"numeric"}
+ )+" ✧";
+
+ $("seleccion").textContent=
+  fechaObjeto(elegida).toLocaleDateString("es-CL",{
+   weekday:"long",
+   day:"numeric",
+   month:"long",
+   year:"numeric"
+  });
 
  const cont=$("dias");
  cont.replaceChildren();
- const y=vista.getFullYear(),m=vista.getMonth();
+
  const inicio=(new Date(y,m,1).getDay()+6)%7;
  const total=new Date(y,m+1,0).getDate();
 
  for(let i=0;i<inicio;i++){
-  const vacio=document.createElement("div");
-  vacio.className="dia vacio";
-  cont.appendChild(vacio);
+  cont.appendChild(document.createElement("div"));
  }
 
  for(let d=1;d<=total;d++){
   const fecha=fechaLocal(new Date(y,m,d));
-  const boton=document.createElement("button");
-  boton.type="button";
-  boton.className="dia";
-  boton.setAttribute("aria-label","Seleccionar "+diaFmt.format(fechaObjeto(fecha)));
+  const b=document.createElement("button");
+  b.className="dia";
 
-  if(fecha===fechaLocal(new Date()))boton.classList.add("hoy");
-  if(fecha===elegida)boton.classList.add("seleccionado");
+  if(fecha===fechaLocal(new Date())){
+   b.classList.add("hoy");
+  }
 
-  const numero=document.createElement("span");
+  if(fecha===elegida){
+   b.classList.add("seleccionado");
+  }
+
+  const numero=document.createElement("div");
   numero.className="numero";
   numero.textContent=d;
 
   const marcas=document.createElement("div");
   marcas.className="marcas";
+
   const lista=eventos.filter(e=>e.fecha===fecha);
-  const recordatorio=lista.some(e=>e.hora&&e.recordatorio>0);
 
   marcas.textContent=
    (lista.length?"💜 "+lista.length+" ":"")+
-   (recordatorio?"🔔 ":"")+
-   (celebraciones(fecha).length?"✨":"");
+   (lista.some(e=>e.hora&&e.recordatorio)?"🔔 ":"")+
+   (celebracion(fecha)?"✨":"");
 
-  boton.append(numero,marcas);
-  boton.addEventListener("click",()=>{
+  b.append(numero,marcas);
+
+  b.onclick=()=>{
    elegida=fecha;
    $("fecha").value=fecha;
    render();
-  });
-  cont.appendChild(boton);
+  };
+
+  cont.appendChild(b);
  }
+
  renderEventos();
  renderPendientes();
  renderBusqueda();
+}
+
+function parrafo(contenedor,texto){
+ const p=document.createElement("p");
+ p.textContent=texto;
+ contenedor.appendChild(p);
+}
+
+function boton(texto,accion){
+ const b=document.createElement("button");
+ b.type="button";
+ b.textContent=texto;
+ b.onclick=accion;
+ return b;
 }
 
 function renderEventos(){
  const cont=$("eventosDia");
  cont.replaceChildren();
 
- const especiales=celebraciones(elegida);
- especiales.forEach(nombre=>{
-  const div=document.createElement("div");
-  div.className="evento";
-  div.textContent=nombre+" · Celebración anual";
-  cont.appendChild(div);
- });
+ const especial=celebracion(elegida);
+
+ if(especial)parrafo(cont,especial);
 
  const lista=eventos.filter(e=>e.fecha===elegida)
-  .sort((a,b)=>(a.hora||"99:99").localeCompare(b.hora||"99:99"));
+ .sort((a,b)=>a.hora.localeCompare(b.hora));
 
- if(!especiales.length&&!lista.length)
-  cont.textContent="No hay eventos para este día.";
+ if(!lista.length&&!especial){
+  parrafo(cont,"No hay eventos para este día.");
+ }
 
  lista.forEach(e=>{
   const div=document.createElement("div");
   div.className="evento";
-  div.appendChild(texto("💜 ",e.titulo));
-  if(e.hora)div.appendChild(texto("🕒 ",e.hora));
-  if(e.descripcion)div.appendChild(texto("",e.descripcion));
-  if(e.recordatorio&&e.hora)
-   div.appendChild(texto("🔔 ","Recordatorio activado"));
+
+  parrafo(div,"💜 "+e.titulo);
+
+  if(e.hora)parrafo(div,"🕒 "+e.hora);
+  if(e.descripcion)parrafo(div,e.descripcion);
+  if(e.recordatorio)parrafo(div,"🔔 Recordatorio activado");
 
   const acciones=document.createElement("div");
   acciones.className="acciones";
 
-  const editar=document.createElement("button");
-  editar.type="button";
-  editar.textContent="✏️ Editar";
-  editar.onclick=()=>{
-   $("idEvento").value=e.id;
-   $("titulo").value=e.titulo;
-   $("fecha").value=e.fecha;
-   $("hora").value=e.hora;
-   $("descripcion").value=e.descripcion;
-   $("recordatorio").value=String(e.recordatorio);
-   $("guardar").textContent="💜 Actualizar evento";
-   $("formulario").scrollIntoView({behavior:"smooth"});
-  };
+  acciones.append(
+   boton("✏️ Editar",()=>{
+    $("idEvento").value=e.id;
+    $("titulo").value=e.titulo;
+    $("fecha").value=e.fecha;
+    $("hora").value=e.hora;
+    $("descripcion").value=e.descripcion;
+    $("recordatorio").value=e.recordatorio;
+    $("guardar").textContent="Actualizar evento";
+    $("formulario").scrollIntoView({behavior:"smooth"});
+   }),
+   boton("🗑️ Eliminar",()=>{
+    if(!confirm("¿Eliminar evento?"))return;
+    const anteriores=eventos.slice();
+    eventos=eventos.filter(x=>x.id!==e.id);
+    if(!guardarDatos())eventos=anteriores;
+    if($("idEvento").value===e.id)limpiar();
+    render();
+   }),
+   boton("📱 Google Calendar",()=>abrirGoogle(e)),
+   boton("📥 ICS",()=>descargarICS(e))
+  );
 
-  const borrar=document.createElement("button");
-  borrar.type="button";
-  borrar.textContent="🗑️ Eliminar";
-  borrar.onclick=()=>{
-   if(!confirm("¿Eliminar este evento?"))return;
-   const anteriores=eventos.slice();
-   eventos=eventos.filter(x=>x.id!==e.id);
-   if(!guardarDatos())eventos=anteriores;
-   else{
-    $("mensaje").textContent="Evento eliminado.";
-    if($("idEvento").value===e.id)limpiarFormulario();
-   }
-   render();
-  };
-
-  const google=document.createElement("button");
-  google.type="button";
-  google.textContent="📱 Google Calendar";
-  google.onclick=()=>abrirGoogle(e);
-
-  const ics=document.createElement("button");
-  ics.type="button";
-  ics.textContent="📥 Archivo ICS";
-  ics.onclick=()=>descargarICS(e);
-
-  acciones.append(editar,borrar,google,ics);
   div.appendChild(acciones);
   cont.appendChild(div);
  });
 }
 
-function renderPendientes(){
- const cont=$("pendientes");
- cont.replaceChildren();
- let cantidad=0;
- const ahora=Date.now();
-
- eventos.forEach(e=>{
-  if(!e.hora||!e.recordatorio)return;
-  const [y,m,d]=e.fecha.split("-").map(Number);
-  const [h,min]=e.hora.split(":").map(Number);
-  const momento=new Date(y,m-1,d,h,min).getTime();
-
-  if(ahora>=momento-e.recordatorio*60000&&ahora<momento){
-   const p=document.createElement("p");
-   p.textContent="🔔 "+e.titulo+" · "+e.fecha+" "+e.hora;
-   cont.appendChild(p);
-   cantidad++;
-  }
- });
- if(!cantidad)cont.textContent="No hay recordatorios pendientes ahora.";
-}
-
-function renderBusqueda(){
- const buscar=$("buscarEvento").value.trim().toLocaleLowerCase("es");
- const cont=$("resultadosBusqueda");
- cont.replaceChildren();
- if(!buscar)return;
-
- const lista=eventos.filter(e=>
-  e.titulo.toLocaleLowerCase("es").includes(buscar)||
-  e.descripcion.toLocaleLowerCase("es").includes(buscar)
- ).sort((a,b)=>a.fecha.localeCompare(b.fecha));
-
- if(!lista.length){
-  cont.textContent="No se encontraron eventos 💜";
-  return;
- }
- lista.forEach(e=>{
-  const div=document.createElement("div");
-  div.className="resultado";
-  div.append(
-   texto("💜 ",e.titulo),
-   texto("📅 ",e.fecha+(e.hora?" · "+e.hora:""))
-  );
-  if(e.descripcion)div.appendChild(texto("",e.descripcion));
-
-  const boton=document.createElement("button");
-  boton.type="button";
-  boton.textContent="📅 Ver evento";
-  boton.onclick=()=>{
-   elegida=e.fecha;
-   const [y,m]=e.fecha.split("-").map(Number);
-   vista=new Date(y,m-1,1);
-   $("fecha").value=elegida;
-   render();
-   $("dias").scrollIntoView({behavior:"smooth"});
-  };
-  div.appendChild(boton);
-  cont.appendChild(div);
- });
-}
-
-function limpiarFormulario(){
+function limpiar(){
  $("formulario").reset();
  $("idEvento").value="";
  $("fecha").value=elegida;
  $("guardar").textContent="💜 Guardar evento";
 }
-function generarId(){
- return window.crypto&&typeof crypto.randomUUID==="function"
-  ?crypto.randomUUID()
-  :Date.now()+"-"+Math.random().toString(36).slice(2);
-}
 
-let temporizadorEscena=null,focoAnterior=null;
-
-function mostrarEscena(){
- focoAnterior=document.activeElement;
- $("tituloEscena").textContent="✨ Lumi está anotando...";
- $("mensajeEscena").textContent="Un momentito, estoy anotando tu evento...";
- $("escenaLumi").classList.remove("oculto");
- $("cerrarEscena").focus();
- clearTimeout(temporizadorEscena);
- temporizadorEscena=setTimeout(()=>{
-  $("tituloEscena").textContent="💜 ¡Evento guardado!";
-  $("mensajeEscena").textContent="¡Listo! Ya lo anoté en nuestro calendario 💜";
- },1800);
-}
-function cerrarEscena(){
- clearTimeout(temporizadorEscena);
- $("escenaLumi").classList.add("oculto");
- if(focoAnterior&&focoAnterior.focus)focoAnterior.focus();
-}
-$("cerrarEscena").onclick=cerrarEscena;
-
-document.addEventListener("keydown",e=>{
- if(e.key==="Escape"&&!$("escenaLumi").classList.contains("oculto"))
-  cerrarEscena();
-});
-
-$("formulario").addEventListener("submit",ev=>{
+$("formulario").onsubmit=ev=>{
  ev.preventDefault();
- const titulo=$("titulo").value.trim();
- const fecha=$("fecha").value;
- const hora=$("hora").value;
- const descripcion=$("descripcion").value.trim();
- const recordatorio=Number($("recordatorio").value);
 
- if(!titulo||!fechaValida(fecha)||!horaValida(hora)){
-  $("mensaje").textContent="Revisa el título, fecha y hora.";
+ const nuevo={
+  id:$("idEvento").value||
+   (crypto.randomUUID?crypto.randomUUID():String(Date.now())),
+  titulo:$("titulo").value.trim(),
+  fecha:$("fecha").value,
+  hora:$("hora").value,
+  descripcion:$("descripcion").value.trim(),
+  recordatorio:Number($("recordatorio").value)
+ };
+
+ if(!valido(nuevo)){
+  $("mensaje").textContent="Revisa los datos del evento.";
   return;
  }
- if(recordatorio&&!hora){
-  $("mensaje").textContent="Indica una hora para activar el recordatorio.";
+
+ if(nuevo.recordatorio&&!nuevo.hora){
+  $("mensaje").textContent="Indica una hora para el recordatorio.";
   return;
  }
 
- const id=$("idEvento").value||generarId();
- const nuevo={id,titulo,fecha,hora,descripcion,recordatorio};
  const anteriores=eventos.slice();
- const indice=eventos.findIndex(e=>e.id===id);
- if(indice>=0)eventos[indice]=nuevo;
+ const i=eventos.findIndex(e=>e.id===nuevo.id);
+
+ if(i>=0)eventos[i]=nuevo;
  else eventos.push(nuevo);
 
  if(!guardarDatos()){
@@ -638,207 +654,180 @@ $("formulario").addEventListener("submit",ev=>{
   return;
  }
 
- elegida=fecha;
- const [y,m]=fecha.split("-").map(Number);
- vista=new Date(y,m-1,1);
- limpiarFormulario();
- $("mensaje").textContent="💜 Evento guardado correctamente.";
- render();
- mostrarEscena();
-});
+ elegida=nuevo.fecha;
+ vista=fechaObjeto(elegida);
+ vista.setDate(1);
 
-$("cancelar").onclick=()=>{
- limpiarFormulario();
- $("mensaje").textContent="Edición cancelada.";
+ limpiar();
+ render();
+
+ $("mensaje").textContent="💜 Evento guardado correctamente.";
+
+ mostrarEscena();
 };
+
+$("cancelar").onclick=limpiar;
+
 $("anterior").onclick=()=>{
- vista=new Date(vista.getFullYear(),vista.getMonth()-1,1);
+ vista.setMonth(vista.getMonth()-1);
  render();
 };
+
 $("siguiente").onclick=()=>{
- vista=new Date(vista.getFullYear(),vista.getMonth()+1,1);
+ vista.setMonth(vista.getMonth()+1);
  render();
 };
+
 $("hoy").onclick=()=>{
- const d=new Date();
- vista=new Date(d.getFullYear(),d.getMonth(),1);
- elegida=fechaLocal(d);
+ elegida=fechaLocal(new Date());
+ vista=fechaObjeto(elegida);
+ vista.setDate(1);
  $("fecha").value=elegida;
  render();
 };
-$("fecha").addEventListener("change",()=>{
- const f=$("fecha").value;
- if(!fechaValida(f))return;
- elegida=f;
- const [y,m]=f.split("-").map(Number);
- vista=new Date(y,m-1,1);
+
+$("fecha").onchange=()=>{
+ if(!$("fecha").value)return;
+ elegida=$("fecha").value;
+ vista=fechaObjeto(elegida);
+ vista.setDate(1);
  render();
-});
-$("buscarEvento").addEventListener("input",renderBusqueda);
+};
+
+function renderBusqueda(){
+ const q=$("buscar").value.trim().toLowerCase();
+ const cont=$("resultados");
+ cont.replaceChildren();
+
+ if(!q)return;
+
+ const lista=eventos.filter(e=>
+  (e.titulo+" "+e.descripcion).toLowerCase().includes(q)
+ );
+
+ if(!lista.length){
+  parrafo(cont,"No se encontraron eventos.");
+ }
+
+ lista.forEach(e=>{
+  const div=document.createElement("div");
+  div.className="evento";
+
+  parrafo(div,e.titulo+" · "+e.fecha);
+
+  div.appendChild(boton("Ver evento",()=>{
+   elegida=e.fecha;
+   vista=fechaObjeto(elegida);
+   vista.setDate(1);
+   $("fecha").value=elegida;
+   render();
+   $("eventosDia").scrollIntoView({behavior:"smooth"});
+  }));
+
+  cont.appendChild(div);
+ });
+}
+
+$("buscar").oninput=renderBusqueda;
+
+function renderPendientes(){
+ const cont=$("pendientes");
+ cont.replaceChildren();
+
+ const ahora=Date.now();
+ let cantidad=0;
+
+ eventos.forEach(e=>{
+  if(!e.hora||!e.recordatorio)return;
+
+  const momento=new Date(e.fecha+"T"+e.hora+":00").getTime();
+
+  if(ahora>=momento-e.recordatorio*60000&&ahora<momento){
+   parrafo(cont,"🔔 "+e.titulo+" · "+e.hora);
+   cantidad++;
+  }
+ });
+
+ if(!cantidad){
+  parrafo(cont,"No hay recordatorios pendientes ahora.");
+ }
+}
+
+function formatoUTC(d){
+ return d.toISOString()
+ .replace(/[-:]/g,"")
+ .replace(/\.\d{3}/,"");
+}
+
+function fechasEvento(e){
+ if(e.hora){
+  const inicio=new Date(e.fecha+"T"+e.hora+":00");
+  const fin=new Date(inicio.getTime()+3600000);
+  return [formatoUTC(inicio),formatoUTC(fin)];
+ }
+
+ const fin=fechaObjeto(e.fecha);
+ fin.setDate(fin.getDate()+1);
+
+ return [
+  e.fecha.replace(/-/g,""),
+  fechaLocal(fin).replace(/-/g,"")
+ ];
+}
+
+function abrirGoogle(e){
+ const fechas=fechasEvento(e);
+
+ const parametros=new URLSearchParams({
+  action:"TEMPLATE",
+  text:e.titulo,
+  dates:fechas.join("/"),
+  details:e.descripcion
+ });
+
+ window.open(
+  "https://calendar.google.com/calendar/render?"+
+  parametros.toString(),
+  "_blank",
+  "noopener,noreferrer"
+ );
+}
 
 function descargar(contenido,tipo,nombre){
  const blob=new Blob([contenido],{type:tipo});
  const url=URL.createObjectURL(blob);
  const a=document.createElement("a");
+
  a.href=url;
  a.download=nombre;
  document.body.appendChild(a);
  a.click();
  a.remove();
+
  setTimeout(()=>URL.revokeObjectURL(url),2000);
 }
 
-$("exportar").onclick=()=>{
- const contenido=JSON.stringify({
-  aplicacion:"Casa-Lumi",
-  version:1,
-  fechaExportacion:new Date().toISOString(),
-  eventos
- },null,2);
- descargar(
-  contenido,"application/json",
-  "Casa-Lumi-Eventos-"+fechaLocal(new Date())+".json"
- );
- $("estadoHerramientas").textContent="💜 Copia preparada para descargar.";
-};
-$("importar").onclick=()=>$("archivo").click();
-
-$("archivo").addEventListener("change",async()=>{
- const archivo=$("archivo").files[0];
- if(!archivo)return;
- try{
-  if(archivo.size>5*1024*1024)
-   throw Error("Archivo demasiado grande.");
-
-  const datos=JSON.parse(await archivo.text());
-  if(!datos||datos.aplicacion!=="Casa-Lumi"||!Array.isArray(datos.eventos))
-   throw Error("No es una copia válida de Casa-Lumi.");
-
-  const importados=datos.eventos.map(normalizar);
-  if(importados.some(e=>!e))
-   throw Error("El archivo contiene eventos inválidos.");
-
-  if(!confirm("¿Importar eventos y conservar los actuales?"))return;
-
-  const anteriores=eventos.slice();
-  const mapa=new Map(eventos.map(e=>[e.id,e]));
-  importados.forEach(e=>mapa.set(e.id,e));
-  eventos=[...mapa.values()];
-
-  if(!guardarDatos()){
-   eventos=anteriores;
-   throw Error("No se pudieron guardar los eventos.");
-  }
-  render();
-  $("estadoHerramientas").textContent="💜 Eventos importados correctamente.";
- }catch(error){
-  $("estadoHerramientas").textContent="⚠️ "+error.message;
- }finally{
-  $("archivo").value="";
- }
-});
-
-
-function abrirGoogle(e){
- if(!e.hora){
-  alert("Indica una hora para enviarlo al calendario del móvil.");
-  return;
- }
-
- const [y,m,d]=e.fecha.split("-").map(Number);
- const [h,min]=e.hora.split(":").map(Number);
-
- const inicio=new Date(y,m-1,d,h,min);
- const fin=new Date(inicio.getTime()+3600000);
-
- const formato=fecha=>
-  fecha.getFullYear()+
-  String(fecha.getMonth()+1).padStart(2,"0")+
-  String(fecha.getDate()).padStart(2,"0")+"T"+
-  String(fecha.getHours()).padStart(2,"0")+
-  String(fecha.getMinutes()).padStart(2,"0")+"00";
-
- const params=new URLSearchParams({
-  action:"TEMPLATE",
-  text:e.titulo,
-  dates:formato(inicio)+"/"+formato(fin),
-  details:e.descripcion||"Evento de Casa-Lumi 💜",
-  ctz:"America/Santiago"
- });
-
- const url="https://calendar.google.com/calendar/render?"+
-  params.toString();
-
- const ventana=window.open(url,"_blank");
-
- if(!ventana){
-  window.location.href=url;
- }
-}
-
 function escaparICS(s){
- return String(s||"")
-  .replace(/\\/g,"\\\\")
-  .replace(/\r?\n/g,"\\n")
-  .replace(/,/g,"\\,")
-  .replace(/;/g,"\\;");
-}
-
-function fechaICS(d){
- return d.getFullYear()+
-  String(d.getMonth()+1).padStart(2,"0")+
-  String(d.getDate()).padStart(2,"0");
-}
-
-function fechaHoraICS(d){
- return fechaICS(d)+"T"+
-  String(d.getHours()).padStart(2,"0")+
-  String(d.getMinutes()).padStart(2,"0")+"00";
+ return String(s)
+ .replace(/\\/g,"\\\\")
+ .replace(/\r\n|\r|\n/g,"\\n")
+ .replace(/,/g,"\\,")
+ .replace(/;/g,"\\;");
 }
 
 function descargarICS(e){
- const [y,m,d]=e.fecha.split("-").map(Number);
- const fecha=new Date(y,m-1,d);
- const ahora=new Date();
-
- let inicio,fin;
-
- if(e.hora){
-  const [h,min]=e.hora.split(":").map(Number);
-
-  const empieza=new Date(y,m-1,d,h,min);
-  const termina=new Date(empieza.getTime()+3600000);
-
-  inicio="DTSTART:"+fechaHoraICS(empieza);
-  fin="DTEND:"+fechaHoraICS(termina);
- }else{
-  const siguiente=new Date(y,m-1,d+1);
-
-  inicio="DTSTART;VALUE=DATE:"+fechaICS(fecha);
-  fin="DTEND;VALUE=DATE:"+fechaICS(siguiente);
- }
-
- const uid=String(e.id)
-  .replace(/[^a-zA-Z0-9-]/g,"")+"@casa-lumi";
-
- const sello=
-  ahora.getUTCFullYear()+
-  String(ahora.getUTCMonth()+1).padStart(2,"0")+
-  String(ahora.getUTCDate()).padStart(2,"0")+"T"+
-  String(ahora.getUTCHours()).padStart(2,"0")+
-  String(ahora.getUTCMinutes()).padStart(2,"0")+
-  String(ahora.getUTCSeconds()).padStart(2,"0")+"Z";
+ const fechas=fechasEvento(e);
+ const tipo=e.hora?"":";VALUE=DATE";
 
  const lineas=[
   "BEGIN:VCALENDAR",
   "VERSION:2.0",
-  "PRODID:-//Casa-Lumi//Calendario Magico//ES",
-  "CALSCALE:GREGORIAN",
+  "PRODID:-//Casa-Lumi//Calendario//ES",
   "BEGIN:VEVENT",
-  "UID:"+uid,
-  "DTSTAMP:"+sello,
-  inicio,
-  fin,
+  "UID:"+escaparICS(e.id)+"@casa-lumi",
+  "DTSTAMP:"+formatoUTC(new Date()),
+  "DTSTART"+tipo+":"+fechas[0],
+  "DTEND"+tipo+":"+fechas[1],
   "SUMMARY:"+escaparICS(e.titulo),
   "DESCRIPTION:"+escaparICS(e.descripcion)
  ];
@@ -853,10 +842,7 @@ function descargarICS(e){
   );
  }
 
- lineas.push(
-  "END:VEVENT",
-  "END:VCALENDAR"
- );
+ lineas.push("END:VEVENT","END:VCALENDAR");
 
  descargar(
   lineas.join("\r\n")+"\r\n",
@@ -865,11 +851,63 @@ function descargarICS(e){
  );
 }
 
-$("fecha").value=elegida;
-render();
-setInterval(renderPendientes,60000);
+$("exportar").onclick=()=>{
+ descargar(
+  JSON.stringify({
+   aplicacion:"Casa-Lumi",
+   version:1,
+   eventos
+  },null,2),
+  "application/json",
+  "Casa-Lumi-Eventos.json"
+ );
+};
 
+$("importar").onclick=()=>$("archivo").click();
+
+$("archivo").onchange=async()=>{
+ try{
+  const archivo=$("archivo").files[0];
+  if(!archivo)return;
+
+  const datos=JSON.parse(await archivo.text());
+
+  if(datos.aplicacion!=="Casa-Lumi"||
+   !Array.isArray(datos.eventos)||
+   !datos.eventos.every(valido)){
+   throw Error("Copia de seguridad inválida.");
+  }
+
+  if(!confirm("¿Importar y conservar los eventos actuales?"))return;
+
+  const anteriores=eventos.slice();
+  const mapa=new Map(eventos.map(e=>[e.id,e]));
+
+  datos.eventos.forEach(e=>mapa.set(e.id,e));
+  eventos=[...mapa.values()];
+
+  if(!guardarDatos()){
+   eventos=anteriores;
+   throw Error("No se pudieron guardar los eventos.");
+  }
+
+  render();
+  alert("Eventos importados correctamente.");
+
+ }catch(error){
+  alert(error.message);
+ }finally{
+  $("archivo").value="";
+ }
+};
+
+$("fecha").value=elegida;
+
+render();
+
+setInterval(renderPendientes,30000);
+
+// FIN PARTE 2
 </script>
 </body>
 </html>
-
